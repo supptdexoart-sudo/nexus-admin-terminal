@@ -56,14 +56,21 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onLogout }) => {
             >
                 {/* Terminal Header */}
                 <div className="bg-black/80 border-x border-t border-white/10 rounded-t-2xl p-6 text-center">
-                    <div className="inline-flex items-center justify-center w-20 h-20 bg-primary/10 border border-primary/30 rounded-2xl mb-6 relative">
-                        <Lock className="w-10 h-10 text-primary" />
-                        <div className="absolute inset-0 border border-primary/20 rounded-2xl animate-ping" />
-                    </div>
-                    <h1 className="text-2xl font-black text-white uppercase tracking-[0.2em] mb-2 leading-none">Admin Terminal</h1>
-                    <div className="flex items-center justify-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                        <p className="text-[10px] text-zinc-500 uppercase tracking-[0.3em] font-bold">Official Google Auth 2.0</p>
+                    <div className="space-y-6">
+                        <div className="text-center space-y-2">
+                            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary/10 border-2 border-primary/20 mb-4">
+                                <ShieldCheck className="w-10 h-10 text-primary" />
+                            </div>
+                            <h1 className="text-3xl font-black uppercase tracking-tighter text-white">
+                                Admin Terminál
+                            </h1>
+                            <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest">
+                                Official Google Auth 2.0
+                            </p>
+                            <p className="text-[10px] text-primary/60 font-medium uppercase tracking-wider">
+                                Native 2FA Protection
+                            </p>
+                        </div>
                     </div>
                 </div>
 
