@@ -88,43 +88,41 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onLogout }) => {
                     )}
 
                     <div className="space-y-6">
-                        <div className="flex flex-col items-center gap-2 text-center mb-4">
-                            <Terminal className="w-5 h-5 text-zinc-600" />
-                            <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest leading-relaxed">
-                                Použijte svůj registrovaný Google účet <br />
-                                <span className="text-primary">{AUTHORIZED_ADMIN}</span>
-                            </p>
-                        </div>
+                        <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest leading-relaxed">
+                            Použijte svůj registrovaný Google účet <br />
+                            <span className="text-primary">{AUTHORIZED_ADMIN}</span>
+                        </p>
+                    </div>
 
-                        <div className="flex justify-center p-2 bg-white/5 border border-white/5 rounded-xl hover:border-primary/30 transition-all">
-                            <GoogleLogin
-                                onSuccess={handleGoogleSuccess}
-                                onError={() => setError('GOOGLE_AUTH_REFUSED: Přihlášení bylo zrušeno.')}
-                                useOneTap
-                                theme="filled_black"
-                                shape="rectangular"
-                                width="310"
-                            />
-                        </div>
+                    <div className="flex justify-center p-2 bg-white/5 border border-white/5 rounded-xl hover:border-primary/30 transition-all">
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={() => setError('GOOGLE_AUTH_REFUSED: Přihlášení bylo zrušeno.')}
+                            useOneTap
+                            theme="filled_black"
+                            shape="rectangular"
+                            width="310"
+                        />
                     </div>
                 </div>
-
-                {/* Footer Info */}
-                <div className="bg-black/40 border-x border-b border-white/10 rounded-b-2xl p-6 text-center">
-                    <div className="flex items-center justify-center gap-4 text-zinc-700">
-                        <div className="flex flex-col items-center">
-                            <AlertTriangle size={12} className="mb-1" />
-                            <span className="text-[8px] font-bold uppercase tracking-widest">Master Access Only</span>
-                        </div>
-                        <div className="w-px h-6 bg-white/5" />
-                        <div className="flex flex-col items-center">
-                            <Lock size={12} className="mb-1" />
-                            <span className="text-[8px] font-bold uppercase tracking-widest">Native 2FA Protection</span>
-                        </div>
-                    </div>
-                </div>
-            </motion.div>
         </div>
+
+                {/* Footer Info */ }
+    <div className="bg-black/40 border-x border-b border-white/10 rounded-b-2xl p-6 text-center">
+        <div className="flex items-center justify-center gap-4 text-zinc-700">
+            <div className="flex flex-col items-center">
+                <AlertTriangle size={12} className="mb-1" />
+                <span className="text-[8px] font-bold uppercase tracking-widest">Master Access Only</span>
+            </div>
+            <div className="w-px h-6 bg-white/5" />
+            <div className="flex flex-col items-center">
+                <Lock size={12} className="mb-1" />
+                <span className="text-[8px] font-bold uppercase tracking-widest">Native 2FA Protection</span>
+            </div>
+        </div>
+    </div>
+            </motion.div >
+        </div >
     );
 };
 
