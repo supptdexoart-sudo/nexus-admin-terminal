@@ -87,13 +87,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onLogout }) => {
                         </motion.div>
                     )}
 
-                    <div className="space-y-6">
-                        <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest leading-relaxed">
-                            Použijte svůj registrovaný Google účet <br />
-                            <span className="text-primary">{AUTHORIZED_ADMIN}</span>
-                        </p>
-                    </div>
-
                     <div className="flex justify-center p-2 bg-white/5 border border-white/5 rounded-xl hover:border-primary/30 transition-all">
                         <GoogleLogin
                             onSuccess={handleGoogleSuccess}
