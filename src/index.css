@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+/* Base Styles */
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #050714;
+  /* darker */
+  color: #e4e4e7;
+  /* zinc-200 */
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(circle at 50% -20%, #0a103d 0%, transparent 60%),
+    radial-gradient(circle at 0% 0%, #050714 0%, transparent 50%);
+}
+
+/* Component Classes - Converted from @apply to Standard CSS to fix build errors */
+.admin-card {
+  background-color: #0c0e14;
+  /* arc-panel */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  /* rounded-xl */
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  /* shadow-2xl */
+  backdrop-filter: blur(12px);
+}
+
+.admin-input {
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  /* bg-black/40 */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  /* rounded-lg */
+  padding: 0.75rem 1rem;
+  color: white;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.15s ease-in-out;
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+}
+
+.admin-input:focus {
+  box-shadow: 0 0 0 2px rgba(0, 217, 255, 0.4), inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  border-color: #00d9ff;
+}
+
+.admin-input::placeholder {
+  color: #52525b;
+  /* zinc-600 */
+}
+
+.admin-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #71717a;
+  /* zinc-500 */
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.admin-button-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  background-color: #00d9ff;
+  /* primary */
+  color: #0a0e27;
+  /* dark */
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.15s;
+  box-shadow: 0 4px 12px rgba(0, 217, 255, 0.3);
+}
+
+.admin-button-primary:hover {
+  background-color: #70eaff;
+}
+
+.admin-button-primary:active {
+  transform: scale(0.95);
+}
+
+.admin-button-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  /* bg-white/5 */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.15s;
+}
+
+.admin-button-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-button-secondary:active {
+  transform: scale(0.95);
+}
+
+/* Utilities */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(10, 14, 39, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 217, 255, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 217, 255, 0.5);
+}
