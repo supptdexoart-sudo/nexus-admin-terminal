@@ -208,16 +208,72 @@ function App() {
 
           <section className="flex-1 overflow-y-auto no-scrollbar p-4 lg:p-8">
             {activeTab === 'generator' && (
-              <Generator
-                onSaveCard={handleSaveCard}
-                userEmail={userEmail}
-                initialData={editingEvent}
-                onClearData={() => setEditingEvent(null)}
-                onDelete={handleDeleteCard}
-                masterCatalog={masterCatalog}
-                isSyncing={isSyncing}
-                onRefresh={loadCatalog}
-              />
+              <>
+                {/* MOBILE ASSET CATALOG */}
+                <div className="xl:hidden mb-8">
+                  <div className="admin-card p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <Database size={16} className="text-primary" />
+                        <h3 className="font-bold text-sm text-white uppercase tracking-wider">Registr Assetů</h3>
+                      </div>
+                      <span className="bg-primary/10 text-primary text-[10px] font-black px-2 py-0.5 rounded-full">{filteredCatalog.length}</span>
+                    </div>
+
+                    {/* Mobile Search */}
+                    <div className="relative mb-4">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Hledat asset..."
+                        className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-primary focus:outline-none transition-all"
+                      />
+                    </div>
+
+                    {/* Asset List */}
+                    <div className="space-y-2 max-h-96 overflow-y-auto">
+                      {filteredCatalog.map((item: GameEvent) => (
+                        <button
+                          key={item.id}
+                          onClick={() => setEditingEvent(item)}
+                          className={`w-full group p-4 rounded-xl transition-all border text-left flex items-center justify-between ${editingEvent?.id === item.id
+                            ? 'bg-primary border-primary shadow-neon text-dark'
+                            : 'bg-white/5 border-white/5 hover:border-white/20 hover:bg-white/10 text-zinc-300'}`}
+                        >
+                          <div className="flex flex-col min-w-0">
+                            <span className={`text-[10px] font-black font-mono tracking-tighter mb-1 truncate ${editingEvent?.id === item.id ? 'text-dark/70' : 'text-primary'}`}>
+                              {item.id}
+                            </span>
+                            <span className="text-sm font-bold truncate leading-tight">{item.title}</span>
+                          </div>
+                          <ChevronRight size={14} className={`opacity-0 group-hover:opacity-100 transition-opacity ${editingEvent?.id === item.id ? 'text-dark' : 'text-zinc-500'}`} />
+                        </button>
+                      ))}
+                      {filteredCatalog.length === 0 && (
+                        <div className="text-center py-12">
+                          <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/5">
+                            <Search className="text-zinc-600" size={24} />
+                          </div>
+                          <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Žádné shody nenalezeny</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <Generator
+                  onSaveCard={handleSaveCard}
+                  userEmail={userEmail}
+                  initialData={editingEvent}
+                  onClearData={() => setEditingEvent(null)}
+                  onDelete={handleDeleteCard}
+                  masterCatalog={masterCatalog}
+                  isSyncing={isSyncing}
+                  onRefresh={loadCatalog}
+                />
+              </>
             )}
             {activeTab === 'characters' && (
               <CharacterManagement userEmail={userEmail} />
