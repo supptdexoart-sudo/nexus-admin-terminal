@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Database, Layout, ShieldCheck, ChevronRight, Search, PlusCircle, RefreshCcw } from 'lucide-react';
+import { Users, Database, Layout, ShieldCheck, ChevronRight, Search, PlusCircle, RefreshCcw, Menu, X } from 'lucide-react';
 import Generator from './components/Generator';
 import CharacterManagement from './components/CharacterManagement';
 import LoginScreen from './components/LoginScreen';
@@ -16,6 +16,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSyncing, setIsSyncing] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(localStorage.getItem('nexus_admin_user'));
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const AUTHORIZED_ADMIN = "zbynekbal97@gmail.com";
 
@@ -87,8 +88,30 @@ function App() {
   return (
     <div className="flex h-screen bg-darker text-zinc-300 font-sans selection:bg-primary/30">
 
+      {/* MOBILE MENU BUTTON */}
+      <button
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-3 bg-black/80 border border-white/10 rounded-xl text-primary hover:bg-primary/10 transition-all"
+      >
+        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      {/* MOBILE OVERLAY */}
+      {isMobileMenuOpen && (
+        <div
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="lg:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
+        />
+      )}
+
       {/* SIDEBAR NAVIGATION */}
-      <aside className="w-16 lg:w-64 flex flex-col bg-black/40 border-r border-white/5 backdrop-blur-xl">
+      <aside className={`
+        fixed lg:static inset-y-0 left-0 z-40
+        w-64 lg:w-16 lg:lg:w-64
+        flex flex-col bg-black/95 lg:bg-black/40 border-r border-white/5 backdrop-blur-xl
+        transform transition-transform duration-300 ease-in-out
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
         <div className="p-4 lg:p-6 flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-neon shrink-0">
             <ShieldCheck className="text-dark w-6 h-6" />
@@ -99,25 +122,25 @@ function App() {
           </div>
         </div>
 
-        <nav className="flex-1 px-2 lg:px-4 space-y-2 py-6">
+        <nav className="flex-1 px-4 space-y-2 py-6">
           <button
-            onClick={() => setActiveTab('generator')}
-            className={`w-full flex items-center gap-3 px-3 lg:px-4 py-3 rounded-xl transition-all group ${activeTab === 'generator'
+            onClick={() => { setActiveTab('generator'); setIsMobileMenuOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all group ${activeTab === 'generator'
               ? 'bg-primary/10 text-primary border border-primary/20 shadow-neon'
               : 'hover:bg-white/5 text-zinc-500 hover:text-white border border-transparent'}`}
           >
             <Layout size={20} className={activeTab === 'generator' ? 'text-primary' : 'group-hover:text-white'} />
-            <span className="hidden lg:block font-bold text-sm uppercase tracking-wide">Fabrikace</span>
+            <span className="font-bold text-sm uppercase tracking-wide">Fabrikace</span>
           </button>
 
           <button
-            onClick={() => setActiveTab('characters')}
-            className={`w-full flex items-center gap-3 px-3 lg:px-4 py-3 rounded-xl transition-all group ${activeTab === 'characters'
+            onClick={() => { setActiveTab('characters'); setIsMobileMenuOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all group ${activeTab === 'characters'
               ? 'bg-primary/10 text-primary border border-primary/20 shadow-neon'
               : 'hover:bg-white/5 text-zinc-500 hover:text-white border border-transparent'}`}
           >
             <Users size={20} className={activeTab === 'characters' ? 'text-primary' : 'group-hover:text-white'} />
-            <span className="hidden lg:block font-bold text-sm uppercase tracking-wide">Postavy</span>
+            <span className="font-bold text-sm uppercase tracking-wide">Postavy</span>
           </button>
         </nav>
 

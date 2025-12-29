@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { GameEventType, PlayerClass } from '../types';
 import type { GameEvent } from '../types';
-import { Download, RotateCcw, QrCode, Trash2, Upload, AlertTriangle, Save, Skull, Database, Layout, RefreshCcw } from 'lucide-react';
+import { Download, RotateCcw, QrCode, Trash2, Upload, AlertTriangle, Save, Skull, Database, Layout, RefreshCcw, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { playSound, vibrate } from '../services/soundService';
 import * as apiService from '../services/apiService';
@@ -297,10 +297,22 @@ const Generator: React.FC<GeneratorProps> = ({
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10">
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-8 relative z-10">
+
+                {/* MOBILE SEARCH - Sticky */}
+                <div className="lg:hidden sticky top-0 z-20 bg-darker/95 backdrop-blur-md p-4 -mx-4 border-b border-white/5">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
+                        <input
+                            type="text"
+                            placeholder="Hledat asset..."
+                            className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-primary focus:outline-none transition-all"
+                        />
+                    </div>
+                </div>
 
                 {/* LEFT COLUMN: BASIC INFO */}
-                <div className="lg:col-span-2 space-y-8">
+                <div className="space-y-8">
                     <div className="admin-card p-6 space-y-6">
                         <div className="flex items-center gap-3 border-b border-white/5 pb-4">
                             <Database className="text-primary w-4 h-4" />
@@ -374,8 +386,8 @@ const Generator: React.FC<GeneratorProps> = ({
                     </div>
                 </div>
 
-                {/* RIGHT COLUMN: PREVIEW & ACTIONS */}
-                <div className="space-y-8">
+                {/* RIGHT COLUMN: PREVIEW & ACTIONS - Responsive */}
+                <div className="space-y-8 lg:sticky lg:top-8 lg:self-start">
                     <div className="admin-card p-6 bg-gradient-to-b from-primary/10 to-transparent sticky top-8">
                         <div className="flex items-center gap-3 border-b border-white/10 pb-4 mb-6">
                             <QrCode className="text-primary w-4 h-4 shadow-neon" />
