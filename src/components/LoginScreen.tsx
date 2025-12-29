@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
-import { ShieldAlert, Terminal, Lock, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { ShieldAlert, Lock, AlertTriangle, ShieldCheck } from 'lucide-react';
 import * as apiService from '../services/apiService';
 import { motion } from 'framer-motion';
 
