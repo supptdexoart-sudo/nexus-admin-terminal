@@ -1,7 +1,7 @@
 import React from 'react';
 import { GameEventType } from '../../types';
 import type { GameEvent } from '../../types';
-import { Moon, Trash2, Clock, Plus, Zap, Tag, MessageSquare, Info, ShieldAlert } from 'lucide-react';
+import { Moon, Trash2, Clock, Zap, Tag, MessageSquare, Info, ShieldAlert, Heart, Swords, Shield, Fuel, Coins, Wind } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface NightVariantPanelProps {
@@ -20,9 +20,10 @@ const NightVariantPanel: React.FC<NightVariantPanelProps> = ({ event, onUpdate }
         });
     };
 
-    const addNightStat = () => {
+    const addNightStat = (label: string = 'HP', value: string = '+10') => {
         const stats = [...(event.timeVariant?.nightStats || [])];
-        stats.push({ label: 'NIGHT_MOD', value: '+5' });
+        if (stats.some(s => s.label.toUpperCase() === label.toUpperCase())) return;
+        stats.push({ label, value });
         updateNightConfig({ nightStats: stats });
     };
 
@@ -38,6 +39,15 @@ const NightVariantPanel: React.FC<NightVariantPanelProps> = ({ event, onUpdate }
         const stats = (event.timeVariant?.nightStats || []).filter((_, i) => i !== index);
         updateNightConfig({ nightStats: stats });
     };
+
+    const quickOptions = [
+        { label: 'HP', icon: Heart, color: 'text-red-500' },
+        { label: 'DMG', icon: Swords, color: 'text-orange-500' },
+        { label: 'ARMOR', icon: Shield, color: 'text-blue-400' },
+        { label: 'PALIVO', icon: Fuel, color: 'text-orange-500' },
+        { label: 'ZLATO', icon: Coins, color: 'text-yellow-500' },
+        { label: 'KYSLÍK', icon: Wind, color: 'text-cyan-400' },
+    ];
 
     const isEnabled = event.timeVariant?.enabled;
 
@@ -156,13 +166,19 @@ const NightVariantPanel: React.FC<NightVariantPanelProps> = ({ event, onUpdate }
                                     </label>
                                     <p className="text-[10px] font-bold text-zinc-600 uppercase">Tyto statistiky zcela nahrazují denní verzi</p>
                                 </div>
-                                <button
-                                    type="button"
-                                    onClick={addNightStat}
-                                    className="p-2 bg-indigo-500/20 text-indigo-400 rounded-xl hover:bg-indigo-500 hover:text-black transition-all shadow-neon-indigo"
-                                >
-                                    <Plus size={18} />
-                                </button>
+                                <div className="flex gap-1">
+                                    {quickOptions.map(opt => (
+                                        <button
+                                            key={opt.label}
+                                            type="button"
+                                            onClick={() => addNightStat(opt.label)}
+                                            className="p-2 bg-black/60 border border-white/5 rounded-xl hover:border-indigo-500/50 transition-all text-zinc-500 hover:text-white"
+                                            title={opt.label}
+                                        >
+                                            <opt.icon size={16} />
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
 
                             <div className="space-y-3">
@@ -176,13 +192,19 @@ const NightVariantPanel: React.FC<NightVariantPanelProps> = ({ event, onUpdate }
                                             className="grid grid-cols-2 gap-3 group/stat"
                                         >
                                             <div className="relative">
-                                                <input
+                                                <select
                                                     value={stat.label}
                                                     onChange={(e) => updateNightStat(idx, 'label', e.target.value)}
-                                                    className="admin-input py-3 pl-10 text-[10px] font-black uppercase font-mono border-indigo-500/5 focus:border-indigo-500/30"
-                                                    placeholder="TAG"
-                                                />
-                                                <Tag size={12} className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-500/30 group-hover/stat:text-indigo-500 transition-all" />
+                                                    className="admin-input py-3 pl-10 text-[10px] font-black uppercase font-mono border-indigo-500/5 focus:border-indigo-500/30 cursor-pointer"
+                                                >
+                                                    {quickOptions.map(opt => (
+                                                        <option key={opt.label} value={opt.label} className="bg-zinc-900">{opt.label}</option>
+                                                    ))}
+                                                    {!quickOptions.some(o => o.label === stat.label) && (
+                                                        <option value={stat.label} className="bg-zinc-900">{stat.label}</option>
+                                                    )}
+                                                </select>
+                                                <Tag size={12} className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-500/30 group-hover/stat:text-indigo-500 transition-all pointer-events-none" />
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <input

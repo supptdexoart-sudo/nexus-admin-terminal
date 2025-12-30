@@ -46,7 +46,7 @@ const initialEventState: GameEvent = {
     enemyLoot: { goldReward: 20, dropItemChance: 0 },
     timeVariant: { enabled: false, nightStats: [] },
     stationConfig: { fuelReward: 50, repairAmount: 30, refillO2: true, welcomeMessage: "Vítejte na palubě." },
-    resourceConfig: { isResourceContainer: false, resourceName: 'Surovina', resourceAmount: 1, customLabel: 'Surovina k Těžbě' },
+    resourceConfig: { isResourceContainer: false, resourceName: 'Surovina', resourceAmount: 1, customLabel: 'NALEZENO:' },
     craftingRecipe: { enabled: false, requiredResources: [], craftingTimeSeconds: 60 },
     planetConfig: { planetId: 'p1', landingEventType: GameEventType.ENCOUNTER, phases: [] }
 };
@@ -248,8 +248,8 @@ const Generator: React.FC<GeneratorProps> = ({
         <div className="max-w-5xl mx-auto space-y-8 pb-32">
 
             {/* TOP ACTIONS BAR */}
-            <div className="flex items-center justify-between mb-8 bg-black/40 p-4 rounded-xl border border-white/5 backdrop-blur-md">
-                <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 bg-black/40 p-4 rounded-xl border border-white/5 backdrop-blur-md gap-6 sm:gap-4">
+                <div className="flex items-center gap-4 w-full sm:w-auto">
                     <div className="bg-primary/20 p-3 rounded-lg">
                         <Layout className="text-primary w-6 h-6" />
                     </div>
@@ -261,27 +261,27 @@ const Generator: React.FC<GeneratorProps> = ({
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar pb-1 sm:pb-0">
                     <button
                         type="button"
                         onClick={handleBackup}
-                        className="p-3 bg-white/5 border border-primary/20 text-primary rounded-lg hover:bg-primary/10 transition-all shadow-neon"
+                        className="p-3 bg-white/5 border border-primary/20 text-primary rounded-lg hover:bg-primary/10 transition-all shadow-neon shrink-0"
                         title="Zálohovat DB"
                     >
                         {isBackingUp ? <RotateCcw className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                     </button>
                     {isEditingMode && (
-                        <button type="button" onClick={handlePurgeClick} className="p-3 bg-red-600/10 border border-red-500/30 text-red-500 rounded-lg hover:bg-red-500/20 transition-all shadow-lg" title="GLOBÁLNÍ ČISTKA">
+                        <button type="button" onClick={handlePurgeClick} className="p-3 bg-red-600/10 border border-red-500/30 text-red-500 rounded-lg hover:bg-red-500/20 transition-all shadow-lg shrink-0" title="GLOBÁLNÍ ČISTKA">
                             <Skull className="w-5 h-5" />
                         </button>
                     )}
                     {isEditingMode && onDelete && (
-                        <button type="button" onClick={handleDeleteClick} className="p-3 bg-white/5 border border-white/10 text-zinc-400 rounded-lg hover:text-red-500 hover:bg-red-500/10 transition-all">
+                        <button type="button" onClick={handleDeleteClick} className="p-3 bg-white/5 border border-white/10 text-zinc-400 rounded-lg hover:text-red-500 hover:bg-red-500/10 transition-all shrink-0">
                             <Trash2 className="w-5 h-5" />
                         </button>
                     )}
                     {isEditingMode && (
-                        <button type="button" onClick={onClearData} className="p-3 bg-white/5 border border-white/10 text-zinc-400 rounded-lg hover:text-primary hover:bg-primary/10 transition-all" title="Resetovat Formu">
+                        <button type="button" onClick={onClearData} className="p-3 bg-white/5 border border-white/10 text-zinc-400 rounded-lg hover:text-primary hover:bg-primary/10 transition-all shrink-0" title="Resetovat Formu">
                             <RotateCcw className="w-5 h-5" />
                         </button>
                     )}
@@ -289,7 +289,7 @@ const Generator: React.FC<GeneratorProps> = ({
                         type="button"
                         onClick={onRefresh}
                         disabled={isSyncing}
-                        className={`p-3 bg-white/5 border border-white/10 text-zinc-400 rounded-lg hover:text-primary transition-all ${isSyncing ? 'opacity-50' : ''}`}
+                        className={`p-3 bg-white/5 border border-white/10 text-zinc-400 rounded-lg hover:text-primary transition-all shrink-0 ${isSyncing ? 'opacity-50' : ''}`}
                         title="Synchronizovat Data"
                     >
                         <RefreshCcw className={`w-5 h-5 ${isSyncing ? 'animate-spin text-primary' : 'text-primary/40'}`} />
@@ -391,7 +391,7 @@ const Generator: React.FC<GeneratorProps> = ({
                     <div className="admin-card p-6 bg-gradient-to-b from-primary/10 to-transparent sticky top-8">
                         <div className="flex items-center gap-3 border-b border-white/10 pb-4 mb-6">
                             <QrCode className="text-primary w-4 h-4 shadow-neon" />
-                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white">Datový Uzel</h3>
+                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white">Identifikace!</h3>
                         </div>
 
                         <div className="flex flex-col items-center">
@@ -407,7 +407,7 @@ const Generator: React.FC<GeneratorProps> = ({
 
                             <div className="w-full space-y-4">
                                 <div className="bg-black/40 border border-white/5 p-4 rounded-xl">
-                                    <p className="admin-label text-center mb-1 text-primary/60">Registry Pointer</p>
+                                    <p className="admin-label text-center mb-1 text-primary/60">ID A QR kod KARTY!!</p>
                                     <p className="text-center font-mono text-xs font-bold text-white truncate px-2">{newEvent.id || 'WAITING_FOR_ID'}</p>
                                 </div>
 

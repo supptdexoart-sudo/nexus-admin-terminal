@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Plus, Trash2, Save, User, FileText, Zap, Shield, Swords, Heart, Moon } from 'lucide-react';
+import { X, Plus, Trash2, Save, User, FileText, Zap, Shield, Swords, Heart, Moon, Fuel, Coins, Wind } from 'lucide-react';
 import type { Character, CharacterPerk } from '../../types';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -19,7 +19,10 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, 
         baseStats: {
             hp: 100,
             armor: 0,
-            damage: 10
+            damage: 10,
+            fuel: 100,
+            gold: 0,
+            oxygen: 100
         },
         perks: [],
         timeVariant: {
@@ -100,7 +103,7 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, 
                             <h2 className="text-xl font-black uppercase tracking-tight text-white leading-none mb-1">
                                 {character ? 'Upravit' : 'Nová'} <span className="text-primary text-2xl">Postava</span>
                             </h2>
-                            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Konfigurace parametrů jednotky</p>
+                            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Konfigurace postavy...</p>
                         </div>
                     </div>
                     <button
@@ -129,7 +132,7 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, 
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     className="admin-input"
-                                    placeholder="NAPŘ. ARC-7 VANGUARD"
+                                    placeholder="NAPŘ. Voják.."
                                 />
                             </div>
 
@@ -156,14 +159,17 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, 
                     <div className="space-y-6">
                         <div className="flex items-center gap-3">
                             <Zap size={16} className="text-primary opacity-60" />
-                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Bojové Parametry</h3>
+                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Základní statistiky postavy:</h3>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {[
                                 { id: 'hp', label: 'Zdraví (HP)', icon: Heart, iconColor: 'text-red-500', value: formData.baseStats.hp },
                                 { id: 'armor', label: 'Brnění (ARM)', icon: Shield, iconColor: 'text-blue-500', value: formData.baseStats.armor },
-                                { id: 'damage', label: 'Útok (DMG)', icon: Swords, iconColor: 'text-orange-500', value: formData.baseStats.damage }
+                                { id: 'damage', label: 'Útok (DMG)', icon: Swords, iconColor: 'text-orange-500', value: formData.baseStats.damage },
+                                { id: 'fuel', label: 'Palivo (FUEL)', icon: Fuel, iconColor: 'text-amber-500', value: formData.baseStats.fuel },
+                                { id: 'gold', label: 'Kredity (GOLD)', icon: Coins, iconColor: 'text-yellow-500', value: formData.baseStats.gold },
+                                { id: 'oxygen', label: 'Kyslík (O2)', icon: Wind, iconColor: 'text-cyan-500', value: formData.baseStats.oxygen }
                             ].map((stat) => (
                                 <div key={stat.id} className="admin-card p-4 bg-black/40 border-white/5 flex flex-col gap-4">
                                     <div className="flex items-center gap-3">
@@ -186,13 +192,13 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, 
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <Plus size={16} className="text-primary opacity-60" />
-                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Instalované Moduly ({formData.perks.length})</h3>
+                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Bonusové statistiky(perky): ({formData.perks.length})</h3>
                             </div>
                             <button
                                 onClick={addPerk}
                                 className="admin-button-secondary py-2 px-4"
                             >
-                                <Plus size={14} /> Přidat Modul
+                                <Plus size={14} /> Přidat PERKY!
                             </button>
                         </div>
 
@@ -208,20 +214,20 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, 
                                     >
                                         <button
                                             onClick={() => removePerk(index)}
-                                            className="absolute top-4 right-4 p-2 text-zinc-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+                                            className="absolute top-4 right-4 p-2 text-zinc-600 hover:text-red-400 lg:opacity-0 lg:group-hover:opacity-100 transition-all"
                                         >
                                             <Trash2 size={16} />
                                         </button>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                             <div className="space-y-2">
-                                                <label className="admin-label">Název Modulu</label>
+                                                <label className="admin-label">Název:</label>
                                                 <input
                                                     type="text"
                                                     value={perk.name}
                                                     onChange={(e) => updatePerk(index, { ...perk, name: e.target.value })}
                                                     className="admin-input text-xs font-black uppercase"
-                                                    placeholder="NÁZEV MODULU"
+                                                    placeholder="....."
                                                 />
                                             </div>
                                             <div className="grid grid-cols-2 gap-3">
@@ -232,9 +238,9 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, 
                                                         onChange={(e) => updatePerk(index, { ...perk, effect: { ...perk.effect, stat: e.target.value } })}
                                                         className="admin-input text-[10px] uppercase font-bold"
                                                     >
-                                                        <option value="damage">ÚTOČNÁ SÍLA</option>
-                                                        <option value="hp">MAX. ZDRAVÍ</option>
-                                                        <option value="armor">ODOLNOST</option>
+                                                        <option value="damage">+ÚTOČNÁ SÍLA</option>
+                                                        <option value="hp">+ZDRAVÍ</option>
+                                                        <option value="armor">+Brnění</option>
                                                     </select>
                                                 </div>
                                                 <div className="space-y-2">
@@ -251,13 +257,13 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, 
 
                                         <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6">
                                             <div className="space-y-2">
-                                                <label className="admin-label">Efekt Modulu</label>
+                                                <label className="admin-label">Efekt perku:</label>
                                                 <input
                                                     type="text"
                                                     value={perk.description}
                                                     onChange={(e) => updatePerk(index, { ...perk, description: e.target.value })}
                                                     className="admin-input text-[10px]"
-                                                    placeholder="POPIS ÚČINKU MODULU PRO UŽIVATELE..."
+                                                    placeholder="POPIS ÚČINKU PRO hráče..."
                                                 />
                                             </div>
                                             <div className="space-y-2">

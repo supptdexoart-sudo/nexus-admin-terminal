@@ -188,7 +188,7 @@ const CombatPanel: React.FC<CombatPanelProps> = ({ event, onUpdate }) => {
                                     <button
                                         type="button"
                                         onClick={() => removeBossPhase(idx)}
-                                        className="absolute -top-2 -right-2 p-2 bg-red-500 text-black rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-neon-red"
+                                        className="absolute -top-2 -right-2 p-2 bg-red-500 text-black rounded-full lg:opacity-0 lg:group-hover:opacity-100 transition-all shadow-neon-red z-10"
                                     >
                                         <X size={14} />
                                     </button>

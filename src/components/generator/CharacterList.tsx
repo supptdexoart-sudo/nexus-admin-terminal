@@ -67,23 +67,23 @@ const CharacterList: React.FC<CharacterListProps> = ({ characters, onEdit, onDel
                                             <h3 className="text-lg font-black text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">{char.name}</h3>
                                             <p className="text-[10px] font-mono font-bold text-zinc-500 tracking-[0.2em] mt-1">{char.characterId}</p>
                                         </div>
-                                        <div className="flex gap-1 ml-4 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                                        <div className="flex gap-1 ml-4 lg:opacity-0 lg:group-hover:opacity-100 transition-all transform lg:translate-x-2 lg:group-hover:translate-x-0">
                                             <button
-                                                onClick={() => setShowQR(char)}
+                                                onClick={(e) => { e.stopPropagation(); setShowQR(char); }}
                                                 className="p-2 bg-white/5 hover:bg-primary/20 text-zinc-400 hover:text-primary rounded-lg transition-all"
                                                 title="Zobrazit QR"
                                             >
                                                 <QrCode size={16} />
                                             </button>
                                             <button
-                                                onClick={() => onEdit(char)}
+                                                onClick={(e) => { e.stopPropagation(); onEdit(char); }}
                                                 className="p-2 bg-white/5 hover:bg-primary/20 text-zinc-400 hover:text-primary rounded-lg transition-all"
                                                 title="Upravit"
                                             >
                                                 <Edit size={16} />
                                             </button>
                                             <button
-                                                onClick={() => handleDelete(char)}
+                                                onClick={(e) => { e.stopPropagation(); handleDelete(char); }}
                                                 className="p-2 bg-white/5 hover:bg-red-500/20 text-zinc-400 hover:text-red-400 rounded-lg transition-all"
                                                 title="Smazat"
                                             >

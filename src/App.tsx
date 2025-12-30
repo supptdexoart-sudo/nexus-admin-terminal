@@ -158,9 +158,9 @@ function App() {
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
         {/* HEADER */}
-        <header className="h-20 border-b border-white/5 flex items-center justify-between px-4 lg:px-8 bg-black/20 backdrop-blur-md shrink-0">
+        <header className="min-h-20 h-auto py-4 border-b border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 lg:px-8 bg-black/20 backdrop-blur-md shrink-0 gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-2 bg-white/5 rounded-lg hidden sm:block">
+            <div className="p-2 bg-white/5 rounded-lg hidden xs:block">
               {activeTab === 'generator' ? <Layout className="text-primary w-5 h-5" /> : <Users className="text-primary w-5 h-5" />}
             </div>
             <div>
@@ -172,8 +172,8 @@ function App() {
                   Nexus Registry <ChevronRight size={10} /> {activeTab}
                 </p>
                 <div className={`px-2 py-0.5 rounded-full border text-[8px] font-black uppercase tracking-tighter flex items-center gap-1 ${(import.meta as any).env.DEV
-                    ? 'bg-blue-500/10 border-blue-500/20 text-blue-400'
-                    : 'bg-purple-500/10 border-purple-500/20 text-purple-400'
+                  ? 'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                  : 'bg-purple-500/10 border-purple-500/20 text-purple-400'
                   }`}>
                   <div className={`w-1 h-1 rounded-full animate-pulse ${(import.meta as any).env.DEV ? 'bg-blue-400' : 'bg-purple-400'}`}></div>
                   {(import.meta as any).env.DEV ? 'Local API' : 'Production API'}
@@ -182,7 +182,7 @@ function App() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
             <div className="hidden md:flex items-center bg-white/5 border border-white/10 rounded-lg px-3 py-2 w-48 lg:w-64 focus-within:border-primary/50 transition-all">
               <Search size={16} className="text-zinc-500" />
               <input
@@ -193,22 +193,24 @@ function App() {
                 className="bg-transparent border-none focus:ring-0 text-xs text-white placeholder:text-zinc-600 w-full"
               />
             </div>
-            <button
-              onClick={loadCatalog}
-              disabled={isSyncing}
-              className={`p-2 bg-white/5 border border-white/10 rounded-lg text-zinc-400 hover:text-primary transition-all ${isSyncing ? 'opacity-50' : ''}`}
-              title="Synchronizovat s mainframe"
-            >
-              <RefreshCcw size={18} className={isSyncing ? 'animate-spin' : ''} />
-            </button>
-            {activeTab === 'generator' && (
+            <div className="flex items-center gap-2">
               <button
-                onClick={() => setEditingEvent(null)}
-                className="flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 text-primary rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-primary/20 transition-all shadow-neon"
+                onClick={loadCatalog}
+                disabled={isSyncing}
+                className={`p-2 bg-white/5 border border-white/10 rounded-lg text-zinc-400 hover:text-primary transition-all ${isSyncing ? 'opacity-50' : ''}`}
+                title="Synchronizovat s mainframe"
               >
-                <PlusCircle size={14} /> <span className="hidden sm:inline">Nový Asset</span>
+                <RefreshCcw size={18} className={isSyncing ? 'animate-spin' : ''} />
               </button>
-            )}
+              {activeTab === 'generator' && (
+                <button
+                  onClick={() => setEditingEvent(null)}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 text-primary rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-primary/20 transition-all shadow-neon shrink-0"
+                >
+                  <PlusCircle size={14} /> <span>Nový Asset</span>
+                </button>
+              )}
+            </div>
           </div>
         </header>
 

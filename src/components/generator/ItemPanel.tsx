@@ -168,7 +168,7 @@ const ItemPanel: React.FC<ItemPanelProps> = ({ event, onUpdate, masterCatalog = 
                     onClick={() => onUpdate({ isConsumable: !event.isConsumable })}
                     className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${event.isConsumable ? 'bg-primary/20 border-primary/50 text-white shadow-neon' : 'bg-black/40 border-white/5 text-zinc-500 hover:border-white/20'}`}
                 >
-                    <div className={`p-2 rounded-xl ${event.isConsumable ? 'bg-primary text-black' : 'bg-zinc-800'}`}>
+                    <div className={`p-2 rounded-xl ${event.isConsumable ? 'bg-primary text-white' : 'bg-zinc-800'}`}>
                         {event.isConsumable ? <CheckSquare size={20} /> : <Square size={20} />}
                     </div>
                     <div className="text-left">
@@ -182,7 +182,7 @@ const ItemPanel: React.FC<ItemPanelProps> = ({ event, onUpdate, masterCatalog = 
                     onClick={() => onUpdate({ isSellOnly: !event.isSellOnly })}
                     className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${event.isSellOnly ? 'bg-red-500/20 border-red-500/50 text-white shadow-neon' : 'bg-black/40 border-white/5 text-zinc-500 hover:border-white/20'}`}
                 >
-                    <div className={`p-2 rounded-xl ${event.isSellOnly ? 'bg-red-500 text-black' : 'bg-zinc-800'}`}>
+                    <div className={`p-2 rounded-xl ${event.isSellOnly ? 'bg-red-500 text-white' : 'bg-zinc-800'}`}>
                         {event.isSellOnly ? <CheckSquare size={20} /> : <Square size={20} />}
                     </div>
                     <div className="text-left">
@@ -235,7 +235,7 @@ const ItemPanel: React.FC<ItemPanelProps> = ({ event, onUpdate, masterCatalog = 
                         >
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="admin-label">ID Suroviny (Unikátní)</label>
+                                    <label className="admin-label">Název suroviny: (musí být Unikátní)</label>
                                     <input
                                         type="text"
                                         value={event.resourceConfig.resourceName || ''}
@@ -245,7 +245,7 @@ const ItemPanel: React.FC<ItemPanelProps> = ({ event, onUpdate, masterCatalog = 
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="admin-label">Výchozí Množství</label>
+                                    <label className="admin-label">Výchozí Množství (při naskenování karty, počet ks)</label>
                                     <input
                                         type="number"
                                         value={event.resourceConfig.resourceAmount || 1}
@@ -255,7 +255,7 @@ const ItemPanel: React.FC<ItemPanelProps> = ({ event, onUpdate, masterCatalog = 
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <label className="admin-label">Popis v Invenáři (Nepovinné)</label>
+                                <label className="admin-label">Popis - nechal bych NALEZENO:</label>
                                 <input
                                     type="text"
                                     value={event.resourceConfig.customLabel || ''}
@@ -383,7 +383,7 @@ const ItemPanel: React.FC<ItemPanelProps> = ({ event, onUpdate, masterCatalog = 
                         >
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-3">
-                                    <label className="admin-label flex items-center gap-2"><Tags size={12} className="text-primary" /> Přebití Ceny v Obchodě</label>
+                                    <label className="admin-label flex items-center gap-2"><Tags size={12} className="text-primary" /> Přebití Ceny v Obchodě-Tržní ceny!</label>
                                     <input
                                         type="number"
                                         placeholder="VÝCHOZÍ SYSTÉMOVÁ CENA"
@@ -406,7 +406,7 @@ const ItemPanel: React.FC<ItemPanelProps> = ({ event, onUpdate, masterCatalog = 
 
                             {/* Class Modifiers */}
                             <div className="space-y-4">
-                                <label className="admin-label flex items-center gap-2 text-primary opacity-80"><Users size={12} /> Ceny pro SPECIFICKÉ TŘÍDY</label>
+                                <label className="admin-label flex items-center gap-2 text-primary opacity-80"><Users size={12} /> Ceny pro SPECIFICKÉ POSTAVY:</label>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                                     <select
                                         value={selectedMarketClass}
@@ -529,12 +529,18 @@ const ItemPanel: React.FC<ItemPanelProps> = ({ event, onUpdate, masterCatalog = 
                                 exit={{ opacity: 0, x: 10 }}
                                 className="flex gap-3 group"
                             >
-                                <input
+                                <select
                                     value={stat.label}
                                     onChange={(e) => updateStat(idx, 'label', e.target.value)}
-                                    className="admin-input flex-[1] text-[10px] font-black uppercase text-primary bg-primary/5"
-                                    placeholder="TAG"
-                                />
+                                    className="admin-input flex-[1] text-[10px] font-black uppercase text-primary bg-primary/5 cursor-pointer"
+                                >
+                                    {quickOptions.map(opt => (
+                                        <option key={opt.label} value={opt.label} className="bg-zinc-900">{opt.label}</option>
+                                    ))}
+                                    {!quickOptions.some(o => o.label === stat.label) && (
+                                        <option value={stat.label} className="bg-zinc-900">{stat.label}</option>
+                                    )}
+                                </select>
                                 <input
                                     value={stat.value}
                                     onChange={(e) => updateStat(idx, 'value', e.target.value)}
