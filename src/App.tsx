@@ -167,9 +167,18 @@ function App() {
               <h2 className="text-lg font-bold text-white uppercase tracking-tight leading-none mb-1">
                 {activeTab === 'generator' ? 'Modul Fabrikace' : 'Správa Postav'}
               </h2>
-              <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest flex items-center gap-1">
-                Nexus Registry <ChevronRight size={10} /> {activeTab}
-              </p>
+              <div className="flex items-center gap-3">
+                <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest flex items-center gap-1">
+                  Nexus Registry <ChevronRight size={10} /> {activeTab}
+                </p>
+                <div className={`px-2 py-0.5 rounded-full border text-[8px] font-black uppercase tracking-tighter flex items-center gap-1 ${(import.meta as any).env.DEV
+                    ? 'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                    : 'bg-purple-500/10 border-purple-500/20 text-purple-400'
+                  }`}>
+                  <div className={`w-1 h-1 rounded-full animate-pulse ${(import.meta as any).env.DEV ? 'bg-blue-400' : 'bg-purple-400'}`}></div>
+                  {(import.meta as any).env.DEV ? 'Local API' : 'Production API'}
+                </div>
+              </div>
             </div>
           </div>
 

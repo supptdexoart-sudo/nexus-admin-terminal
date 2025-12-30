@@ -22,10 +22,12 @@ const CharacterManagement: React.FC<CharacterManagementProps> = ({ userEmail }) 
 
     const loadCharacters = async () => {
         try {
+            console.log(`🔍 [CHARACTER] Fetching characters for admin: ${userEmail}`);
             const chars = await apiService.getCharacters(userEmail);
+            console.log(`✅ [CHARACTER] Fetched ${chars.length} subjects from registry.`);
             setCharacters(chars);
-        } catch (e) {
-            console.error('Failed to load characters:', e);
+        } catch (e: any) {
+            console.error('❌ [CHARACTER] Failed to load characters:', e.message);
         }
     };
 
