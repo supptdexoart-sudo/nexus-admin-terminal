@@ -131,14 +131,23 @@ export const acknowledgeRoundEnd = async (roomId: string, userName: string): Pro
 
 // REMOVED: loginUser (Legacy password auth)
 
-export const loginWithGoogle = async (credential: string): Promise<{ email: string; isNewUser: boolean }> => {
+
+export const loginWithGoogle = async (credential: string): Promise<{ email: string; isNewUser: boolean; adminToken?: string }> => {
   const url = `${BASE_API_URL}/auth/google`;
   // Posíláme i Client ID z frontendu jako fallback pro backend
-  return fetchData<{ email: string; isNewUser: boolean }>(url, {
+  const response = await fetchData<{ email: string; isNewUser: boolean; adminToken?: string }>(url, {
     method: 'POST',
     body: JSON.stringify({ credential, clientId: CLIENT_ID_FROM_ENV })
   });
+
+  // If admin token is returned, save it to sessionStorage
+  if (response.adminToken) {
+    sessionStorage.setItem(ADMIN_TOKEN_KEY, response.adminToken);
+  }
+
+  return response;
 };
+
 
 export const getInventory = async (userEmail: string): Promise<GameEvent[]> => fetchData<GameEvent[]>(`${BASE_API_URL}/inventory/${userEmail}`);
 export const saveCard = async (userEmail: string, event: GameEvent): Promise<GameEvent> => fetchData<GameEvent>(`${BASE_API_URL}/inventory/${userEmail}`, { method: 'POST', body: JSON.stringify(event) });
