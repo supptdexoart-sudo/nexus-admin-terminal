@@ -23,7 +23,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onLogout }) => {
 
                 if (data.email.toLowerCase() === AUTHORIZED_ADMIN.toLowerCase()) {
                     // FIX: Vynutit uložení správného uživatele pro API volání
-                    localStorage.setItem('nexus_current_user', data.email);
+                    localStorage.setItem('nexus_admin_user', data.email);
                     onLogin(data.email);
                 } else {
                     setError('PŘÍSTUP ODEPŘEN: Účet nemá administrátorská oprávnění.');

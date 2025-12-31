@@ -20,7 +20,7 @@ export interface FriendRequest {
 const fetchData = async <T>(url: string, options: RequestInit = {}, silent: boolean = false): Promise<T> => {
   if (!navigator.onLine) throw new Error("OFFLINE_MODE");
   try {
-    const currentUser = localStorage.getItem('nexus_current_user'); // Získání aktuálního uživatele
+    const currentUser = localStorage.getItem('nexus_admin_user'); // Získání aktuálního uživatele
 
     const headers = new Headers(options.headers || {});
 
