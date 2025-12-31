@@ -11,20 +11,22 @@ interface SpaceStationPanelProps {
 const SpaceStationPanel: React.FC<SpaceStationPanelProps> = ({ event, onUpdate }) => {
 
     const updateConfig = (field: string, value: any) => {
+        const currentConfig = event.stationConfig || {
+            fuelReward: 50,
+            repairAmount: 30,
+            refillO2: true,
+            welcomeMessage: "Vítejte na palubě.",
+            modules: {
+                shop: { enabled: true, title: "Obchodní Zóna" },
+                factory: { enabled: false, title: "Výrobní Linka" },
+                quarters: { enabled: true, title: "Ubytování Posádky" },
+                missions: { enabled: false, title: "Mise a Úkoly" }
+            }
+        };
+
         onUpdate({
             stationConfig: {
-                ...(event.stationConfig || {
-                    fuelReward: 50,
-                    repairAmount: 30,
-                    refillO2: true,
-                    welcomeMessage: "Vítejte na palubě.",
-                    modules: {
-                        shop: { enabled: true, title: "Obchodní Zóna" },
-                        factory: { enabled: false, title: "Výrobní Linka" },
-                        quarters: { enabled: true, title: "Ubytování Posádky" },
-                        missions: { enabled: false, title: "Mise a Úkoly" }
-                    }
-                }),
+                ...currentConfig,
                 [field]: value
             }
         });

@@ -45,7 +45,18 @@ const initialEventState: GameEvent = {
     trapConfig: { difficulty: 10, damage: 20, disarmClass: PlayerClass.ROGUE, successMessage: "Past zneškodněna.", failMessage: "Past sklapla!" },
     enemyLoot: { goldReward: 20, dropItemChance: 0 },
     timeVariant: { enabled: false, nightStats: [] },
-    stationConfig: { fuelReward: 50, repairAmount: 30, refillO2: true, welcomeMessage: "Vítejte na palubě." },
+    stationConfig: {
+        fuelReward: 50,
+        repairAmount: 30,
+        refillO2: true,
+        welcomeMessage: "Vítejte na palubě.",
+        modules: {
+            shop: { enabled: true, title: "Obchodní Zóna" },
+            factory: { enabled: false, title: "Výrobní Linka" },
+            quarters: { enabled: true, title: "Ubytování Posádky" },
+            missions: { enabled: false, title: "Mise a Úkoly" }
+        }
+    },
     resourceConfig: { isResourceContainer: false, resourceName: 'Surovina', resourceAmount: 1, customLabel: 'NALEZENO:' },
     craftingRecipe: { enabled: false, requiredResources: [], craftingTimeSeconds: 60 },
     planetConfig: { planetId: 'p1', landingEventType: GameEventType.ENCOUNTER, phases: [] }
@@ -102,6 +113,18 @@ const Generator: React.FC<GeneratorProps> = ({
                     enabled: initialData.craftingRecipe?.enabled ?? false,
                     requiredResources: initialData.craftingRecipe?.requiredResources ?? [],
                     craftingTimeSeconds: initialData.craftingRecipe?.craftingTimeSeconds ?? 60
+                },
+                stationConfig: {
+                    fuelReward: initialData.stationConfig?.fuelReward ?? 50,
+                    repairAmount: initialData.stationConfig?.repairAmount ?? 30,
+                    refillO2: initialData.stationConfig?.refillO2 ?? true,
+                    welcomeMessage: initialData.stationConfig?.welcomeMessage ?? "Vítejte na palubě.",
+                    modules: initialData.stationConfig?.modules ?? {
+                        shop: { enabled: true, title: "Obchodní Zóna" },
+                        factory: { enabled: false, title: "Výrobní Linka" },
+                        quarters: { enabled: true, title: "Ubytování Posádky" },
+                        missions: { enabled: false, title: "Mise a Úkoly" }
+                    }
                 },
                 planetConfig: {
                     planetId: initialData.planetConfig?.planetId ?? 'p1',
