@@ -112,9 +112,7 @@ const MerchantPanel: React.FC<MerchantPanelProps> = ({ event, onUpdate }) => {
                             {characters.map((char) => {
                                 const charConfig = event.tradeConfig?.[char.id] || {
                                     buyDiscount: 0,
-                                    sellBonus: 0,
-                                    stealChance: 0,
-                                    specialAbility: ''
+                                    stealChance: 0
                                 };
 
                                 return (
@@ -123,7 +121,7 @@ const MerchantPanel: React.FC<MerchantPanelProps> = ({ event, onUpdate }) => {
                                             {char.name}
                                         </div>
 
-                                        <div className="grid grid-cols-3 gap-3">
+                                        <div className="grid grid-cols-2 gap-3">
                                             <div className="space-y-1">
                                                 <span className="text-[8px] font-black text-green-500 uppercase block">
                                                     💰 Nákupní sleva %
@@ -134,20 +132,6 @@ const MerchantPanel: React.FC<MerchantPanelProps> = ({ event, onUpdate }) => {
                                                     value={charConfig.buyDiscount}
                                                     onChange={(e) => updateTradeConfig(char.id, 'buyDiscount', parseInt(e.target.value) || 0)}
                                                     className="admin-input py-2 text-xs font-mono text-center border-green-500/20"
-                                                    placeholder="0"
-                                                />
-                                            </div>
-
-                                            <div className="space-y-1">
-                                                <span className="text-[8px] font-black text-yellow-500 uppercase block">
-                                                    💸 Prodejní bonus %
-                                                </span>
-                                                <input
-                                                    type="number"
-                                                    min="0" max="100"
-                                                    value={charConfig.sellBonus}
-                                                    onChange={(e) => updateTradeConfig(char.id, 'sellBonus', parseInt(e.target.value) || 0)}
-                                                    className="admin-input py-2 text-xs font-mono text-center border-yellow-500/20"
                                                     placeholder="0"
                                                 />
                                             </div>
@@ -165,19 +149,6 @@ const MerchantPanel: React.FC<MerchantPanelProps> = ({ event, onUpdate }) => {
                                                     placeholder="0"
                                                 />
                                             </div>
-                                        </div>
-
-                                        <div className="space-y-1">
-                                            <span className="text-[8px] font-black text-cyan-500 uppercase block">
-                                                ✨ Speciální schopnost (popis)
-                                            </span>
-                                            <input
-                                                type="text"
-                                                value={charConfig.specialAbility || ''}
-                                                onChange={(e) => updateTradeConfig(char.id, 'specialAbility', e.target.value)}
-                                                className="admin-input py-2 text-xs border-cyan-500/20"
-                                                placeholder="Např: Může vyměnit 1 předmět zdarma..."
-                                            />
                                         </div>
                                     </div>
                                 );
