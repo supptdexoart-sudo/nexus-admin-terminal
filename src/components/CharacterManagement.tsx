@@ -9,10 +9,9 @@ import { Users, PlusCircle } from 'lucide-react';
 interface CharacterManagementProps {
     userEmail: string;
     onRefreshReady?: (refreshFn: () => void) => void;
-    isSyncing?: boolean;
 }
 
-const CharacterManagement: React.FC<CharacterManagementProps> = ({ userEmail, onRefreshReady, isSyncing = false }) => {
+const CharacterManagement: React.FC<CharacterManagementProps> = ({ userEmail, onRefreshReady }) => {
     const [characters, setCharacters] = useState<Character[]>([]);
     const [editingCharacter, setEditingCharacter] = useState<Character | null>(null);
     const [showCreator, setShowCreator] = useState(false);

@@ -299,7 +299,6 @@ function App() {
               <CharacterManagement
                 userEmail={userEmail}
                 onRefreshReady={(fn) => setCharacterRefreshFn(() => fn)}
-                isSyncing={isSyncing}
               />
             )}
           </section>
