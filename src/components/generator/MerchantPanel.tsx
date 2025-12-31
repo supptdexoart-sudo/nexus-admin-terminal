@@ -23,12 +23,16 @@ const MerchantPanel: React.FC<MerchantPanelProps> = ({ event, onUpdate }) => {
         const loadCharacters = async () => {
             try {
                 const adminEmail = localStorage.getItem('admin_email');
+                console.log('[MerchantPanel] Admin email:', adminEmail);
                 if (adminEmail) {
                     const chars = await apiService.getCharacters(adminEmail);
+                    console.log('[MerchantPanel] Loaded characters:', chars);
                     setCharacters(chars);
+                } else {
+                    console.warn('[MerchantPanel] No admin email found in localStorage');
                 }
             } catch (e) {
-                console.error('Failed to load characters:', e);
+                console.error('[MerchantPanel] Failed to load characters:', e);
             }
         };
         loadCharacters();
