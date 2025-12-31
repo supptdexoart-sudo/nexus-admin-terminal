@@ -17,6 +17,7 @@ function App() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(localStorage.getItem('nexus_admin_user'));
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [characterRefreshFn, setCharacterRefreshFn] = useState<(() => void) | null>(null);
 
   const AUTHORIZED_ADMIN = "zbynekbal97@gmail.com";
 
@@ -44,19 +45,6 @@ function App() {
       setMasterCatalog(catalog);
     } catch (e) {
       console.error("Failed to load catalog", e);
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
-  const loadCharacters = async () => {
-    if (!userEmail) return;
-    setIsSyncing(true);
-    try {
-      // CharacterManagement si spravuje vlastní state, tady jen triggerujeme refresh
-      await apiService.getCharacters(userEmail);
-    } catch (e) {
-      console.error("Failed to load characters", e);
     } finally {
       setIsSyncing(false);
     }
@@ -208,7 +196,15 @@ function App() {
             </div>
             <div className="flex items-center gap-2">
               <button
-                onClick={activeTab === 'generator' ? loadCatalog : loadCharacters}
+                onClick={() => {
+                  if (activeTab === 'generator') {
+                    loadCatalog();
+                  } else if (characterRefreshFn) {
+                    setIsSyncing(true);
+                    characterRefreshFn();
+                    setTimeout(() => setIsSyncing(false), 500);
+                  }
+                }}
                 disabled={isSyncing}
                 className={`p-2 bg-white/5 border border-white/10 rounded-lg text-zinc-400 hover:text-primary transition-all ${isSyncing ? 'opacity-50' : ''}`}
                 title="Synchronizovat s mainframe"
@@ -302,7 +298,7 @@ function App() {
             {activeTab === 'characters' && (
               <CharacterManagement
                 userEmail={userEmail}
-                onRefresh={loadCharacters}
+                onRefreshReady={(fn) => setCharacterRefreshFn(() => fn)}
                 isSyncing={isSyncing}
               />
             )}

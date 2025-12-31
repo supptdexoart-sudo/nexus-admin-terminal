@@ -4,23 +4,19 @@ import * as apiService from '../services/apiService';
 import CharacterList from './generator/CharacterList';
 import CharacterCreator from './generator/CharacterCreator';
 import { playSound } from '../services/soundService';
-import { Users, PlusCircle, RefreshCcw } from 'lucide-react';
+import { Users, PlusCircle } from 'lucide-react';
 
 interface CharacterManagementProps {
     userEmail: string;
-    onRefresh?: () => void;
+    onRefreshReady?: (refreshFn: () => void) => void;
     isSyncing?: boolean;
 }
 
-const CharacterManagement: React.FC<CharacterManagementProps> = ({ userEmail, onRefresh, isSyncing = false }) => {
+const CharacterManagement: React.FC<CharacterManagementProps> = ({ userEmail, onRefreshReady, isSyncing = false }) => {
     const [characters, setCharacters] = useState<Character[]>([]);
     const [editingCharacter, setEditingCharacter] = useState<Character | null>(null);
     const [showCreator, setShowCreator] = useState(false);
     const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-
-    useEffect(() => {
-        loadCharacters();
-    }, [userEmail]);
 
     const loadCharacters = async () => {
         try {
@@ -32,6 +28,17 @@ const CharacterManagement: React.FC<CharacterManagementProps> = ({ userEmail, on
             console.error('❌ [CHARACTER] Failed to load characters:', e.message);
         }
     };
+
+    useEffect(() => {
+        loadCharacters();
+    }, [userEmail]);
+
+    // Expose loadCharacters to parent via callback
+    useEffect(() => {
+        if (onRefreshReady) {
+            onRefreshReady(loadCharacters);
+        }
+    }, [onRefreshReady]);
 
     const handleCreate = () => {
         setEditingCharacter(null);
@@ -93,23 +100,13 @@ const CharacterManagement: React.FC<CharacterManagementProps> = ({ userEmail, on
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={onRefresh}
-                        disabled={isSyncing}
-                        className={`p-3 bg-white/5 border border-white/10 rounded-lg text-zinc-400 hover:text-primary transition-all ${isSyncing ? 'opacity-50' : ''}`}
-                        title="Synchronizovat postavy"
-                    >
-                        <RefreshCcw className={`w-5 h-5 ${isSyncing ? 'animate-spin text-primary' : ''}`} />
-                    </button>
-                    <button
-                        onClick={handleCreate}
-                        className="admin-button-primary"
-                    >
-                        <PlusCircle size={20} />
-                        <span className="hidden sm:inline">Vytvořit Postavu</span>
-                    </button>
-                </div>
+                <button
+                    onClick={handleCreate}
+                    className="admin-button-primary"
+                >
+                    <PlusCircle size={20} />
+                    <span className="hidden sm:inline">Vytvořit Postavu</span>
+                </button>
             </div>
 
             <div className="grid grid-cols-1">
