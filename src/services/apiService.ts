@@ -184,3 +184,11 @@ export const deleteCharacter = async (adminEmail: string, characterId: string): 
 export const logout = async (email: string): Promise<{ success: boolean, message: string }> => {
   return fetchData(`${BASE_API_URL}/auth/logout`, { method: 'POST', body: JSON.stringify({ email }) });
 };
+
+export const checkSession = async (): Promise<{ authenticated: boolean; email?: string }> => {
+  try {
+    return await fetchData<{ authenticated: boolean; email?: string }>(`${BASE_API_URL}/auth/check`, { method: 'GET' }, true);
+  } catch (e) {
+    return { authenticated: false };
+  }
+};

@@ -27,6 +27,42 @@ function App() {
     localStorage.removeItem('ADMIN_ADMIN_TOKEN');
     sessionStorage.removeItem('nexus_admin_token');
 
+    // Check if user is already authenticated (via HttpOnly cookie)
+    const checkAuthStatus = async () => {
+      try {
+        const data = await apiService.checkSession();
+        if (data.authenticated && data.email) {
+          console.log('✅ Session active for:', data.email);
+          setUserEmail(data.email);
+          localStorage.setItem('nexus_admin_user', data.email);
+        }
+      } catch (e) {
+        console.warn('No active session found');
+      }
+    };
+
+    checkAuthStatus();
+
+    // Auto-logout on page close/tab close (User requirement)
+    const handleUnload = () => {
+      const email = localStorage.getItem('nexus_admin_user');
+      if (email) {
+        const url = `${(import.meta as any).env.DEV ? '/api' : 'https://nexus-backend-m492.onrender.com/api'}/auth/logout`;
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+          keepalive: true,
+          credentials: 'include'
+        });
+      }
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
+    return () => window.removeEventListener('beforeunload', handleUnload);
+  }, []);
+
+  useEffect(() => {
     if (userEmail?.toLowerCase() === AUTHORIZED_ADMIN.toLowerCase()) {
       loadCatalog();
     }
