@@ -63,8 +63,15 @@ export interface BossPhase {
     damageBonus: number;
 }
 
+export interface CharacterMerchantBonus {
+    buyDiscount: number;      // % sleva při nákupu (0-100)
+    sellBonus: number;        // % bonus při prodeji (0-100)
+    stealChance: number;      // % šance na krádež (0-100)
+    specialAbility?: string;  // Popis speciální schopnosti
+}
+
 export interface MerchantTradeConfig {
-    [characterId: string]: number; // Dynamic character bonuses/discounts
+    [characterId: string]: CharacterMerchantBonus; // Dynamic character bonuses
 }
 
 export interface TrapConfig {

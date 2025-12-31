@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { GameEvent } from '../../types';
+import type { GameEvent, CharacterMerchantBonus } from '../../types';
 import { ShoppingBag, Coins, Trash2, Percent, Plus, Tag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as apiService from '../../services/apiService';
@@ -42,12 +42,22 @@ const MerchantPanel: React.FC<MerchantPanelProps> = ({ event, onUpdate }) => {
         onUpdate({ canSellToMerchant: e.target.checked });
     };
 
-    const updateTradeConfig = (characterId: string, value: number) => {
+    const updateTradeConfig = (characterId: string, field: keyof CharacterMerchantBonus, value: number | string) => {
         const currentConfig = event.tradeConfig || {};
+        const currentCharConfig = currentConfig[characterId] || {
+            buyDiscount: 0,
+            sellBonus: 0,
+            stealChance: 0,
+            specialAbility: ''
+        };
+
         onUpdate({
             tradeConfig: {
                 ...currentConfig,
-                [characterId]: value
+                [characterId]: {
+                    ...currentCharConfig,
+                    [field]: value
+                }
             }
         });
     };
@@ -115,23 +125,82 @@ const MerchantPanel: React.FC<MerchantPanelProps> = ({ event, onUpdate }) => {
 
                     <div className="p-4 bg-yellow-500/5 border border-yellow-500/10 rounded-2xl space-y-4">
                         <label className="admin-label text-yellow-500/80 flex items-center gap-2 m-0 mt-2">
-                            <Tag size={12} /> Afinity a Bonusy podle postav
+                            <Tag size={12} /> Bonusy a schopnosti podle postav
                         </label>
-                        <div className="grid grid-cols-2 gap-4">
-                            {characters.map((char) => (
-                                <div key={char.id} className="space-y-1">
-                                    <span className="text-[8px] font-black text-zinc-500 uppercase flex items-center gap-1">
-                                        {char.name}
-                                    </span>
-                                    <input
-                                        type="number"
-                                        value={event.tradeConfig?.[char.id] ?? 0}
-                                        onChange={(e) => updateTradeConfig(char.id, parseInt(e.target.value))}
-                                        className="admin-input py-2 text-xs font-mono text-center"
-                                        placeholder="Sleva %"
-                                    />
-                                </div>
-                            ))}
+                        <div className="space-y-6">
+                            {characters.map((char) => {
+                                const charConfig = event.tradeConfig?.[char.id] || {
+                                    buyDiscount: 0,
+                                    sellBonus: 0,
+                                    stealChance: 0,
+                                    specialAbility: ''
+                                };
+
+                                return (
+                                    <div key={char.id} className="p-4 bg-black/40 border border-white/5 rounded-xl space-y-3">
+                                        <div className="text-xs font-black text-white uppercase border-b border-white/5 pb-2">
+                                            {char.name}
+                                        </div>
+
+                                        <div className="grid grid-cols-3 gap-3">
+                                            <div className="space-y-1">
+                                                <span className="text-[8px] font-black text-green-500 uppercase block">
+                                                    💰 Nákupní sleva %
+                                                </span>
+                                                <input
+                                                    type="number"
+                                                    min="0" max="100"
+                                                    value={charConfig.buyDiscount}
+                                                    onChange={(e) => updateTradeConfig(char.id, 'buyDiscount', parseInt(e.target.value) || 0)}
+                                                    className="admin-input py-2 text-xs font-mono text-center border-green-500/20"
+                                                    placeholder="0"
+                                                />
+                                            </div>
+
+                                            <div className="space-y-1">
+                                                <span className="text-[8px] font-black text-yellow-500 uppercase block">
+                                                    💸 Prodejní bonus %
+                                                </span>
+                                                <input
+                                                    type="number"
+                                                    min="0" max="100"
+                                                    value={charConfig.sellBonus}
+                                                    onChange={(e) => updateTradeConfig(char.id, 'sellBonus', parseInt(e.target.value) || 0)}
+                                                    className="admin-input py-2 text-xs font-mono text-center border-yellow-500/20"
+                                                    placeholder="0"
+                                                />
+                                            </div>
+
+                                            <div className="space-y-1">
+                                                <span className="text-[8px] font-black text-red-500 uppercase block">
+                                                    🎲 Šance na krádež %
+                                                </span>
+                                                <input
+                                                    type="number"
+                                                    min="0" max="100"
+                                                    value={charConfig.stealChance}
+                                                    onChange={(e) => updateTradeConfig(char.id, 'stealChance', parseInt(e.target.value) || 0)}
+                                                    className="admin-input py-2 text-xs font-mono text-center border-red-500/20"
+                                                    placeholder="0"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <span className="text-[8px] font-black text-cyan-500 uppercase block">
+                                                ✨ Speciální schopnost (popis)
+                                            </span>
+                                            <input
+                                                type="text"
+                                                value={charConfig.specialAbility || ''}
+                                                onChange={(e) => updateTradeConfig(char.id, 'specialAbility', e.target.value)}
+                                                className="admin-input py-2 text-xs border-cyan-500/20"
+                                                placeholder="Např: Může vyměnit 1 předmět zdarma..."
+                                            />
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                         {characters.length === 0 && (
                             <div className="text-center py-4 text-[10px] text-zinc-600 uppercase">
