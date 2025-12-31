@@ -64,10 +64,7 @@ export interface BossPhase {
 }
 
 export interface MerchantTradeConfig {
-    warriorDiscount: number;
-    clericDiscount: number;
-    mageDiscount: number;
-    rogueStealChance: number;
+    [characterId: string]: number; // Dynamic character bonuses/discounts
 }
 
 export interface TrapConfig {

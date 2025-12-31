@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { GameEvent } from '../../types';
-import { ShoppingBag, Coins, Trash2, Swords, Cross, Wand2, Footprints, Percent, Plus, Tag } from 'lucide-react';
+import { ShoppingBag, Coins, Trash2, Percent, Plus, Tag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import * as apiService from '../../services/apiService';
 
 interface MerchantPanelProps {
     event: GameEvent;
@@ -15,21 +16,34 @@ const MerchantPanel: React.FC<MerchantPanelProps> = ({ event, onUpdate }) => {
     const [merchantItemPrice, setMerchantItemPrice] = useState(0);
     const [merchantItemSellPrice, setMerchantItemSellPrice] = useState(0);
     const [merchantItemSaleChance, setMerchantItemSaleChance] = useState(0);
+    const [characters, setCharacters] = useState<any[]>([]);
+
+    // Load characters from API
+    useEffect(() => {
+        const loadCharacters = async () => {
+            try {
+                const adminEmail = localStorage.getItem('admin_email');
+                if (adminEmail) {
+                    const chars = await apiService.getCharacters(adminEmail);
+                    setCharacters(chars);
+                }
+            } catch (e) {
+                console.error('Failed to load characters:', e);
+            }
+        };
+        loadCharacters();
+    }, []);
 
     const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         onUpdate({ canSellToMerchant: e.target.checked });
     };
 
-    const updateTradeConfig = (field: string, value: number) => {
+    const updateTradeConfig = (characterId: string, value: number) => {
+        const currentConfig = event.tradeConfig || {};
         onUpdate({
             tradeConfig: {
-                ...(event.tradeConfig || {
-                    warriorDiscount: 10,
-                    clericDiscount: 45,
-                    mageDiscount: 25,
-                    rogueStealChance: 30
-                }),
-                [field]: value
+                ...currentConfig,
+                [characterId]: value
             }
         });
     };
@@ -91,62 +105,39 @@ const MerchantPanel: React.FC<MerchantPanelProps> = ({ event, onUpdate }) => {
                                 checked={event.canSellToMerchant ?? false}
                                 onChange={handleCheckboxChange}
                             />
-                            <div className="w-11 h-6 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            <div className="w-11 h-6 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
                         </label>
                     </div>
 
                     <div className="p-4 bg-yellow-500/5 border border-yellow-500/10 rounded-2xl space-y-4">
                         <label className="admin-label text-yellow-500/80 flex items-center gap-2 m-0 mt-2">
-                            <Tag size={12} /> Afinity a Krádeže
+                            <Tag size={12} /> Afinity a Bonusy podle postav
                         </label>
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1">
-                                <span className="text-[8px] font-black text-zinc-500 uppercase flex items-center gap-1"><Swords size={10} /> Warrior</span>
-                                <input
-                                    type="number"
-                                    value={event.tradeConfig?.warriorDiscount ?? 10}
-                                    onChange={(e) => updateTradeConfig('warriorDiscount', parseInt(e.target.value))}
-                                    className="admin-input py-2 text-xs font-mono text-center"
-                                />
-                            </div>
-                            <div className="space-y-1">
-                                <span className="text-[8px] font-black text-zinc-500 uppercase flex items-center gap-1"><Cross size={10} /> Cleric</span>
-                                <input
-                                    type="number"
-                                    value={event.tradeConfig?.clericDiscount ?? 45}
-                                    onChange={(e) => updateTradeConfig('clericDiscount', parseInt(e.target.value))}
-                                    className="admin-input py-2 text-xs font-mono text-center"
-                                />
-                            </div>
+                            {characters.map((char) => (
+                                <div key={char.id} className="space-y-1">
+                                    <span className="text-[8px] font-black text-zinc-500 uppercase flex items-center gap-1">
+                                        {char.name}
+                                    </span>
+                                    <input
+                                        type="number"
+                                        value={event.tradeConfig?.[char.id] ?? 0}
+                                        onChange={(e) => updateTradeConfig(char.id, parseInt(e.target.value))}
+                                        className="admin-input py-2 text-xs font-mono text-center"
+                                        placeholder="Sleva %"
+                                    />
+                                </div>
+                            ))}
                         </div>
+                        {characters.length === 0 && (
+                            <div className="text-center py-4 text-[10px] text-zinc-600 uppercase">
+                                Žádné postavy k dispozici. Vytvořte postavy v sekci "Tvorba postav".
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                <div className="admin-card p-6 bg-black/40 space-y-6 flex flex-col justify-end">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                            <span className="text-[8px] font-black text-zinc-500 uppercase flex items-center gap-1"><Wand2 size={10} /> Mage Sleva %</span>
-                            <input
-                                type="number"
-                                value={event.tradeConfig?.mageDiscount ?? 25}
-                                onChange={(e) => updateTradeConfig('mageDiscount', parseInt(e.target.value))}
-                                className="admin-input py-2 text-xs font-mono text-center"
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <span className="text-[8px] font-black text-zinc-500 uppercase flex items-center gap-1"><Footprints size={10} /> Rogue Krádež %</span>
-                            <input
-                                type="number"
-                                value={event.tradeConfig?.rogueStealChance ?? 30}
-                                onChange={(e) => updateTradeConfig('rogueStealChance', parseInt(e.target.value))}
-                                className="admin-input py-2 text-xs font-mono text-center border-green-500/20"
-                            />
-                        </div>
-                    </div>
-                    <div className="text-[9px] font-bold text-zinc-600 uppercase leading-relaxed text-center italic border-t border-white/5 pt-4">
-                        Tyto hodnoty ovlivňují finální cenu a interakce v tržním rozhraní hráče.
-                    </div>
-                </div>
+
             </div>
 
             {/* ADD ITEM MODULE */}
