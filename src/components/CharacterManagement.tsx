@@ -4,13 +4,15 @@ import * as apiService from '../services/apiService';
 import CharacterList from './generator/CharacterList';
 import CharacterCreator from './generator/CharacterCreator';
 import { playSound } from '../services/soundService';
-import { Users, PlusCircle } from 'lucide-react';
+import { Users, PlusCircle, RefreshCcw } from 'lucide-react';
 
 interface CharacterManagementProps {
     userEmail: string;
+    onRefresh?: () => void;
+    isSyncing?: boolean;
 }
 
-const CharacterManagement: React.FC<CharacterManagementProps> = ({ userEmail }) => {
+const CharacterManagement: React.FC<CharacterManagementProps> = ({ userEmail, onRefresh, isSyncing = false }) => {
     const [characters, setCharacters] = useState<Character[]>([]);
     const [editingCharacter, setEditingCharacter] = useState<Character | null>(null);
     const [showCreator, setShowCreator] = useState(false);
@@ -47,6 +49,8 @@ const CharacterManagement: React.FC<CharacterManagementProps> = ({ userEmail }) 
             setFeedback({ message: 'Postava uložena!', type: 'success' });
             playSound('success');
             setShowCreator(false);
+            // Malé zpoždění pro zajištění zápisu do DB před načtením
+            await new Promise(resolve => setTimeout(resolve, 300));
             await loadCharacters();
             setTimeout(() => setFeedback(null), 3000);
         } catch (e: any) {
@@ -61,7 +65,9 @@ const CharacterManagement: React.FC<CharacterManagementProps> = ({ userEmail }) 
             await apiService.deleteCharacter(userEmail, characterId);
             setFeedback({ message: 'Postava smazána.', type: 'success' });
             playSound('success');
-            setCharacters(prev => prev.filter(c => c.characterId !== characterId));
+            // Malé zpoždění pro zajištění smazání v DB
+            await new Promise(resolve => setTimeout(resolve, 300));
+            await loadCharacters();
             setTimeout(() => setFeedback(null), 3000);
         } catch (e: any) {
             setFeedback({ message: `Chyba: ${e.message}`, type: 'error' });
@@ -87,13 +93,23 @@ const CharacterManagement: React.FC<CharacterManagementProps> = ({ userEmail }) 
                     </div>
                 </div>
 
-                <button
-                    onClick={handleCreate}
-                    className="admin-button-primary"
-                >
-                    <PlusCircle size={20} />
-                    <span className="hidden sm:inline">Vytvořit Postavu</span>
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={onRefresh}
+                        disabled={isSyncing}
+                        className={`p-3 bg-white/5 border border-white/10 rounded-lg text-zinc-400 hover:text-primary transition-all ${isSyncing ? 'opacity-50' : ''}`}
+                        title="Synchronizovat postavy"
+                    >
+                        <RefreshCcw className={`w-5 h-5 ${isSyncing ? 'animate-spin text-primary' : ''}`} />
+                    </button>
+                    <button
+                        onClick={handleCreate}
+                        className="admin-button-primary"
+                    >
+                        <PlusCircle size={20} />
+                        <span className="hidden sm:inline">Vytvořit Postavu</span>
+                    </button>
+                </div>
             </div>
 
             <div className="grid grid-cols-1">

@@ -11,6 +11,7 @@ type Tab = 'generator' | 'characters';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('generator');
+  const [characters, setCharacters] = useState<any[]>([]);
   const [masterCatalog, setMasterCatalog] = useState<GameEvent[]>([]);
   const [editingEvent, setEditingEvent] = useState<GameEvent | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -44,6 +45,19 @@ function App() {
       setMasterCatalog(catalog);
     } catch (e) {
       console.error("Failed to load catalog", e);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const loadCharacters = async () => {
+    if (!userEmail) return;
+    setIsSyncing(true);
+    try {
+      const chars = await apiService.getCharacters(userEmail);
+      setCharacters(chars);
+    } catch (e) {
+      console.error("Failed to load characters", e);
     } finally {
       setIsSyncing(false);
     }
@@ -195,7 +209,7 @@ function App() {
             </div>
             <div className="flex items-center gap-2">
               <button
-                onClick={loadCatalog}
+                onClick={activeTab === 'generator' ? loadCatalog : loadCharacters}
                 disabled={isSyncing}
                 className={`p-2 bg-white/5 border border-white/10 rounded-lg text-zinc-400 hover:text-primary transition-all ${isSyncing ? 'opacity-50' : ''}`}
                 title="Synchronizovat s mainframe"
@@ -287,7 +301,11 @@ function App() {
               </>
             )}
             {activeTab === 'characters' && (
-              <CharacterManagement userEmail={userEmail} />
+              <CharacterManagement
+                userEmail={userEmail}
+                onRefresh={loadCharacters}
+                isSyncing={isSyncing}
+              />
             )}
           </section>
 
