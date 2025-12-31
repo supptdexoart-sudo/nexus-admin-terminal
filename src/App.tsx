@@ -32,7 +32,17 @@ function App() {
     setUserEmail(email);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const email = localStorage.getItem('nexus_admin_user');
+    if (email) {
+      try {
+        await apiService.logout(email);
+        console.log('🚪 Logout successful, session destroyed on backend');
+      } catch (e) {
+        console.error('Logout API failed:', e);
+        // Continue with local logout even if API fails
+      }
+    }
     localStorage.removeItem('nexus_admin_user');
     setUserEmail(null);
   };

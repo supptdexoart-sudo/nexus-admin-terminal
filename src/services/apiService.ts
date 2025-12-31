@@ -181,3 +181,8 @@ export const getCharacters = async (adminEmail: string): Promise<any[]> => fetch
 export const getCharacterById = async (characterId: string): Promise<any | null> => { try { return await fetchData<any>(`${BASE_API_URL}/characters/by-id/${encodeURIComponent(characterId)}`, undefined, true); } catch { return null; } };
 export const saveCharacter = async (adminEmail: string, character: any): Promise<any> => fetchData<any>(`${BASE_API_URL}/characters/${adminEmail}`, { method: 'POST', body: JSON.stringify(character) });
 export const deleteCharacter = async (adminEmail: string, characterId: string): Promise<void> => fetchData<void>(`${BASE_API_URL}/characters/${adminEmail}/${encodeURIComponent(characterId)}`, { method: 'DELETE' });
+
+// Logout
+export const logout = async (email: string): Promise<{ success: boolean, message: string }> => {
+  return fetchData(`${BASE_API_URL}/auth/logout`, { method: 'POST', body: JSON.stringify({ email }) });
+};
