@@ -1,6 +1,6 @@
 import React from 'react';
 import type { GameEvent } from '../../types';
-import { Satellite, Wind, Shield, Fuel, Radio, Scan, Terminal, Activity } from 'lucide-react';
+import { Satellite, Wind, Shield, Fuel, Radio, Scan, Terminal, Activity, Layout } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface SpaceStationPanelProps {
