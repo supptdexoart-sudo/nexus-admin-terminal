@@ -7,7 +7,7 @@ const BASE_API_URL = (import.meta as any).env.DEV
   ? '/api'
   : 'https://nexus-backend-m492.onrender.com/api';
 
-const ADMIN_TOKEN_KEY = 'nexus_admin_token';
+// const ADMIN_TOKEN_KEY = 'nexus_admin_token'; // REMOVED: Using HttpOnly cookies instead
 
 // Fix TS error accessing env in Vite
 const CLIENT_ID_FROM_ENV = (import.meta as any).env.VITE_GOOGLE_CLIENT_ID;
@@ -20,13 +20,9 @@ export interface FriendRequest {
 const fetchData = async <T>(url: string, options: RequestInit = {}, silent: boolean = false): Promise<T> => {
   if (!navigator.onLine) throw new Error("OFFLINE_MODE");
   try {
-    const adminToken = sessionStorage.getItem(ADMIN_TOKEN_KEY);
     const currentUser = localStorage.getItem('nexus_current_user'); // Získání aktuálního uživatele
 
     const headers = new Headers(options.headers || {});
-
-    // Autentizační hlavičky
-    if (adminToken) headers.set('x-admin-key', adminToken);
 
     // Pro admin aplikaci vynutíme admin email pokud není přihlášen jiný uživatel
     const activeEmail = currentUser || 'zbynekbal97@gmail.com';
@@ -34,7 +30,12 @@ const fetchData = async <T>(url: string, options: RequestInit = {}, silent: bool
 
     if (!headers.has('Content-Type') && !(options.body instanceof FormData)) headers.set('Content-Type', 'application/json');
 
-    const response = await fetch(url, { ...options, headers, cache: 'no-cache' });
+    const response = await fetch(url, {
+      ...options,
+      headers,
+      cache: 'no-cache',
+      credentials: 'include' // ✅ SECURE - Enable HttpOnly cookies
+    });
 
     if (!response.ok) {
       // Zkusíme přečíst JSON chybu, pokud to jde, jinak text statusu
@@ -53,7 +54,10 @@ export const checkHealth = async (): Promise<boolean> => {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 2000);
-    const res = await fetch(`${BASE_API_URL}/health`, { signal: controller.signal });
+    const res = await fetch(`${BASE_API_URL}/health`, {
+      signal: controller.signal,
+      credentials: 'include' // ✅ Added for security consistency
+    });
     clearTimeout(timeout);
     return res.ok;
   } catch { return false; }
@@ -61,13 +65,12 @@ export const checkHealth = async (): Promise<boolean> => {
 
 export const downloadBackup = async (): Promise<void> => {
   if (!navigator.onLine) throw new Error("Nelze zálohovat v offline režimu.");
-  const adminToken = sessionStorage.getItem(ADMIN_TOKEN_KEY);
   const currentUser = localStorage.getItem('nexus_current_user') || 'zbynekbal97@gmail.com';
 
   const response = await fetch(`${BASE_API_URL}/admin/backup`, {
     method: 'GET',
+    credentials: 'include', // ✅ Use HttpOnly cookies
     headers: {
-      'x-admin-key': adminToken || '',
       'x-user-email': currentUser
     }
   });
@@ -132,18 +135,13 @@ export const acknowledgeRoundEnd = async (roomId: string, userName: string): Pro
 // REMOVED: loginUser (Legacy password auth)
 
 
-export const loginWithGoogle = async (credential: string): Promise<{ email: string; isNewUser: boolean; adminToken?: string }> => {
+export const loginWithGoogle = async (credential: string): Promise<{ email: string; isNewUser: boolean }> => {
   const url = `${BASE_API_URL}/auth/google`;
   // Posíláme i Client ID z frontendu jako fallback pro backend
-  const response = await fetchData<{ email: string; isNewUser: boolean; adminToken?: string }>(url, {
+  const response = await fetchData<{ email: string; isNewUser: boolean }>(url, {
     method: 'POST',
     body: JSON.stringify({ credential, clientId: CLIENT_ID_FROM_ENV })
   });
-
-  // If admin token is returned, save it to sessionStorage
-  if (response.adminToken) {
-    sessionStorage.setItem(ADMIN_TOKEN_KEY, response.adminToken);
-  }
 
   return response;
 };

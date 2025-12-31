@@ -22,6 +22,11 @@ function App() {
   const AUTHORIZED_ADMIN = "zbynekbal97@gmail.com";
 
   useEffect(() => {
+    // SECURITY: Clear legacy unsafe tokens from storage
+    localStorage.removeItem('nexus_admin_token');
+    localStorage.removeItem('ADMIN_ADMIN_TOKEN');
+    sessionStorage.removeItem('nexus_admin_token');
+
     if (userEmail?.toLowerCase() === AUTHORIZED_ADMIN.toLowerCase()) {
       loadCatalog();
     }
