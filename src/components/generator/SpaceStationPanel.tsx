@@ -17,11 +17,59 @@ const SpaceStationPanel: React.FC<SpaceStationPanelProps> = ({ event, onUpdate }
                     fuelReward: 50,
                     repairAmount: 30,
                     refillO2: true,
-                    welcomeMessage: "Vítejte na palubě."
+                    welcomeMessage: "Vítejte na palubě.",
+                    modules: {
+                        shop: { enabled: true, title: "Obchodní Zóna" },
+                        factory: { enabled: false, title: "Výrobní Linka" },
+                        quarters: { enabled: true, title: "Ubytování Posádky" },
+                        missions: { enabled: false, title: "Mise a Úkoly" }
+                    }
                 }),
                 [field]: value
             }
         });
+    };
+
+    const updateModule = (moduleName: 'shop' | 'factory' | 'quarters' | 'missions', field: 'enabled' | 'title', value: any) => {
+        const currentConfig = event.stationConfig || {
+            fuelReward: 50, repairAmount: 30, refillO2: true, welcomeMessage: "Vítejte na palubě.",
+            modules: {
+                shop: { enabled: true, title: "Obchodní Zóna" },
+                factory: { enabled: false, title: "Výrobní Linka" },
+                quarters: { enabled: true, title: "Ubytování Posádky" },
+                missions: { enabled: false, title: "Mise a Úkoly" }
+            }
+        };
+
+        const currentModules = currentConfig.modules || {
+            shop: { enabled: true, title: "Obchodní Zóna" },
+            factory: { enabled: false, title: "Výrobní Linka" },
+            quarters: { enabled: true, title: "Ubytování Posádky" },
+            missions: { enabled: false, title: "Mise a Úkoly" }
+        };
+
+        onUpdate({
+            stationConfig: {
+                ...currentConfig,
+                modules: {
+                    ...currentModules,
+                    [moduleName]: {
+                        ...currentModules[moduleName],
+                        [field]: value
+                    }
+                }
+            }
+        });
+    };
+
+    const getModuleIcon = (name: string) => {
+        switch (name) {
+            case 'shop': return <Terminal size={16} />;
+            case 'factory': return <Activity size={16} />;
+            case 'quarters': return <Shield size={16} />;
+            case 'missions': return <Scan size={16} />;
+            default: return <Satellite size={16} />;
+        }
     };
 
     return (
@@ -131,19 +179,49 @@ const SpaceStationPanel: React.FC<SpaceStationPanelProps> = ({ event, onUpdate }
                         <div className="w-14 h-7 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-cyan-600"></div>
                     </label>
                 </div>
+            </div>
 
-                {event.stationConfig?.refillO2 && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="mt-6 pt-6 border-t border-cyan-500/20 flex items-center justify-between"
-                    >
-                        <div className="flex items-center gap-2">
-                            <Scan size={14} className="text-cyan-500 animate-[spin_4s_linear_infinite]" />
-                            <span className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.2em]">OXY_DENSITY: OPTIMAL (100%)</span>
-                        </div>
-                    </motion.div>
-                )}
+            {/* MODULES CONFIG */}
+            <div className="space-y-4">
+                <div className="flex items-center gap-3 border-b border-white/5 pb-2">
+                    <Layout size={14} className="text-cyan-500" />
+                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Instalované Moduly</h3>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3">
+                    {['shop', 'factory', 'quarters', 'missions'].map((modKey) => {
+                        const mKey = modKey as 'shop' | 'factory' | 'quarters' | 'missions';
+                        const module = event.stationConfig?.modules?.[mKey] || { enabled: false, title: modKey.toUpperCase() };
+
+                        return (
+                            <div key={mKey} className={`admin-card p-4 flex items-center justify-between transition-all ${module.enabled ? 'border-cyan-500/30 bg-cyan-500/5' : 'opacity-60 grayscale'}`}>
+                                <div className="flex items-center gap-4">
+                                    <div className={`p-2 rounded-lg ${module.enabled ? 'bg-cyan-500 text-black' : 'bg-white/10 text-white/40'}`}>
+                                        {getModuleIcon(mKey)}
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <input
+                                            value={module.title}
+                                            onChange={(e) => updateModule(mKey, 'title', e.target.value)}
+                                            className="bg-transparent border-none p-0 text-sm font-black text-white uppercase focus:ring-0 focus:outline-none"
+                                            disabled={!module.enabled}
+                                        />
+                                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{mKey} MODULE</span>
+                                    </div>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        className="sr-only peer"
+                                        checked={module.enabled}
+                                        onChange={(e) => updateModule(mKey, 'enabled', e.target.checked)}
+                                    />
+                                    <div className="w-9 h-5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-500"></div>
+                                </label>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
 
         </div>

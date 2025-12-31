@@ -93,11 +93,25 @@ export interface EnemyLoot {
     // REMOVED XP REWARD
 }
 
+export interface StationModuleConfig {
+    enabled: boolean;
+    title?: string;
+    description?: string;
+}
+
 export interface StationConfig {
     fuelReward: number;     // Kolik paliva se doplní (např. 50)
     repairAmount: number;   // Kolik HP/Hull se opraví (např. 30)
     refillO2: boolean;      // Zda doplnit O2 na 100% (true)
     welcomeMessage: string;
+    // New Modules
+    modules?: {
+        shop: StationModuleConfig;
+        factory: StationModuleConfig;
+        quarters: StationModuleConfig;
+        missions: StationModuleConfig;
+    };
+    backgroundImage?: string;
 }
 
 export interface ResourceConfig {
