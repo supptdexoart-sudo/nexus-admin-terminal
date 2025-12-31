@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { GameEvent, CharacterMerchantBonus } from '../../types';
-import { ShoppingBag, Coins, Trash2, Percent, Plus, Tag } from 'lucide-react';
+import { ShoppingBag, Trash2, Percent, Plus, Tag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as apiService from '../../services/apiService';
 
@@ -38,9 +38,7 @@ const MerchantPanel: React.FC<MerchantPanelProps> = ({ event, onUpdate }) => {
         loadCharacters();
     }, []);
 
-    const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        onUpdate({ canSellToMerchant: e.target.checked });
-    };
+
 
     const updateTradeConfig = (characterId: string, field: keyof CharacterMerchantBonus, value: number | string) => {
         const currentConfig = event.tradeConfig || {};
@@ -105,23 +103,6 @@ const MerchantPanel: React.FC<MerchantPanelProps> = ({ event, onUpdate }) => {
             {/* MERCHANT SETTINGS & CLASS BONUSES */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="admin-card p-6 bg-black/40 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                            <label className="admin-label m-0 flex items-center gap-2">
-                                <Coins size={14} className="text-yellow-500" /> Povolit prodej hráčů
-                            </label>
-                            <p className="text-[10px] font-bold text-zinc-600 uppercase">Hráči mohou prodávat předměty tomuto NPC</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                className="sr-only peer"
-                                checked={event.canSellToMerchant ?? false}
-                                onChange={handleCheckboxChange}
-                            />
-                            <div className="w-11 h-6 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
-                        </label>
-                    </div>
 
                     <div className="p-4 bg-yellow-500/5 border border-yellow-500/10 rounded-2xl space-y-4">
                         <label className="admin-label text-yellow-500/80 flex items-center gap-2 m-0 mt-2">
