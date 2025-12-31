@@ -22,7 +22,7 @@ const MerchantPanel: React.FC<MerchantPanelProps> = ({ event, onUpdate }) => {
     useEffect(() => {
         const loadCharacters = async () => {
             try {
-                const adminEmail = localStorage.getItem('admin_email');
+                const adminEmail = localStorage.getItem('nexus_admin_user');
                 console.log('[MerchantPanel] Admin email:', adminEmail);
                 if (adminEmail) {
                     const chars = await apiService.getCharacters(adminEmail);
