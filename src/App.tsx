@@ -11,7 +11,6 @@ type Tab = 'generator' | 'characters';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('generator');
-  const [characters, setCharacters] = useState<any[]>([]);
   const [masterCatalog, setMasterCatalog] = useState<GameEvent[]>([]);
   const [editingEvent, setEditingEvent] = useState<GameEvent | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -54,8 +53,8 @@ function App() {
     if (!userEmail) return;
     setIsSyncing(true);
     try {
-      const chars = await apiService.getCharacters(userEmail);
-      setCharacters(chars);
+      // CharacterManagement si spravuje vlastní state, tady jen triggerujeme refresh
+      await apiService.getCharacters(userEmail);
     } catch (e) {
       console.error("Failed to load characters", e);
     } finally {
