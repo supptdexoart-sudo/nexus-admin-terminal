@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { PlayerClass } from '../../types';
 import type { GameEvent, Stat } from '../../types';
-import { Box, Heart, Swords, Shield, Coins, Wind, Trash2, Fuel, Plus, Clock, ShoppingCart, Recycle, Users, Tags, X, Hammer, CheckSquare, Square, Zap, Scroll, AlertTriangle } from 'lucide-react';
+import { Box, Heart, Shield, Coins, Wind, Trash2, Fuel, Plus, Clock, ShoppingCart, Recycle, Users, Tags, X, Hammer, CheckSquare, Square, Zap, Scroll, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ItemPanelProps {
