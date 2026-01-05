@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Plus, Trash2, Save, User, FileText, Zap, Shield, Swords, Heart, Moon, Fuel, Coins, Wind } from 'lucide-react';
+import { X, Plus, Trash2, Save, User, FileText, Zap, Shield, Swords, Heart, Moon, Fuel, Coins, Wind, AlertTriangle } from 'lucide-react';
 import type { Character, CharacterPerk } from '../../types';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -10,28 +10,39 @@ interface CharacterCreatorProps {
 }
 
 const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, onClose }) => {
-    const [formData, setFormData] = useState<Character>(character || {
-        characterId: '',
-        adminEmail: '',
-        name: '',
-        description: '',
-        imageUrl: '',
-        baseStats: {
-            hp: 100,
-            armor: 0,
-            damage: 10,
-            fuel: 100,
-            gold: 0,
-            oxygen: 100
-        },
-        perks: [],
-        timeVariant: {
-            enabled: false,
-            nightModifiers: {
-                statChanges: [],
-                additionalPerks: []
-            }
+    const [formData, setFormData] = useState<Character>(() => {
+        if (character) {
+            // Pokud načítáme existující postavu, zajistíme že má všechna pole
+            return {
+                ...character,
+                hullDamageChance: character.hullDamageChance ?? 0 // Fallback na 0 pokud není definováno
+            };
         }
+        // Default pro novou postavu
+        return {
+            characterId: '',
+            adminEmail: '',
+            name: '',
+            description: '',
+            imageUrl: '',
+            baseStats: {
+                hp: 100,
+                armor: 0,
+                damage: 10,
+                fuel: 100,
+                gold: 0,
+                oxygen: 100
+            },
+            perks: [],
+            hullDamageChance: 0,
+            timeVariant: {
+                enabled: false,
+                nightModifiers: {
+                    statChanges: [],
+                    additionalPerks: []
+                }
+            }
+        };
     });
 
     const [isSaving, setIsSaving] = useState(false);
@@ -184,6 +195,48 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, 
                                     />
                                 </div>
                             ))}
+                        </div>
+                    </div>
+
+                    {/* Section: Hull Damage Chance */}
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-3">
+                            <AlertTriangle size={16} className="text-red-500 opacity-60" />
+                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Poškození Trupu Lodi:</h3>
+                        </div>
+
+                        <div className="admin-card p-6 bg-black/40 border-white/5">
+                            <div className="flex items-center gap-4 mb-4">
+                                <AlertTriangle size={24} className="text-red-500" />
+                                <div className="flex-1">
+                                    <label className="admin-label mb-1">% Šance na poškození trupu při skenování karty</label>
+                                    <p className="text-[10px] text-zinc-600 uppercase tracking-widest">Při každém skenování se provede kontrola - pokud náhodné číslo je menší než tato hodnota, trup lodi se poškodí o -5 bodů.</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-6">
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="100"
+                                    value={formData.hullDamageChance || 0}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, hullDamageChance: parseInt(e.target.value) }))}
+                                    className="flex-1 h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer"
+                                    style={{
+                                        background: `linear-gradient(to right, #ef4444 0%, #ef4444 ${formData.hullDamageChance || 0}%, #27272a ${formData.hullDamageChance || 0}%, #27272a 100%)`
+                                    }}
+                                />
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        value={formData.hullDamageChance || 0}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, hullDamageChance: Math.min(100, Math.max(0, parseInt(e.target.value) || 0)) }))}
+                                        className="admin-input w-20 text-center text-2xl font-black text-red-500"
+                                    />
+                                    <span className="text-xl font-black text-zinc-600">%</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

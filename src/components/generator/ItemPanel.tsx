@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { PlayerClass } from '../../types';
 import type { GameEvent, Stat } from '../../types';
-import { Box, Heart, Swords, Shield, Coins, Wind, Trash2, Fuel, Plus, Clock, ShoppingCart, Recycle, Users, Tags, X, Hammer, CheckSquare, Square, Zap, Scroll } from 'lucide-react';
+import { Box, Heart, Swords, Shield, Coins, Wind, Trash2, Fuel, Plus, Clock, ShoppingCart, Recycle, Users, Tags, X, Hammer, CheckSquare, Square, Zap, Scroll, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ItemPanelProps {
@@ -138,13 +138,13 @@ const ItemPanel: React.FC<ItemPanelProps> = ({ event, onUpdate, masterCatalog = 
         item => item.resourceConfig?.isResourceContainer
     );
 
-    const quickOptions = [
+    const statOptions = [
         { label: 'HP', icon: Heart, color: 'text-red-500' },
-        { label: 'DMG', icon: Swords, color: 'text-orange-500' },
-        { label: 'ARMOR', icon: Shield, color: 'text-blue-400' },
-        { label: 'PALIVO', icon: Fuel, color: 'text-orange-500' },
-        { label: 'ZLATO', icon: Coins, color: 'text-yellow-500' },
-        { label: 'KYSLÍK', icon: Wind, color: 'text-cyan-400' },
+        { label: 'GOLD', icon: Coins, color: 'text-yellow-500' },
+        { label: 'ARMOR', icon: Shield, color: 'text-blue-500' },
+        { label: 'FUEL', icon: Fuel, color: 'text-orange-500' },
+        { label: 'O2', icon: Wind, color: 'text-cyan-500' },
+        { label: 'TRUP', icon: AlertTriangle, color: 'text-orange-600' } // Nová statistika pro poškození trupu
     ];
 
     return (
@@ -505,7 +505,7 @@ const ItemPanel: React.FC<ItemPanelProps> = ({ event, onUpdate, masterCatalog = 
                         <label className="admin-label m-0">Aktivní Modifikátory</label>
                     </div>
                     <div className="flex gap-1">
-                        {quickOptions.map(opt => (
+                        {statOptions.map(opt => (
                             <button
                                 key={opt.label}
                                 type="button"
@@ -534,10 +534,10 @@ const ItemPanel: React.FC<ItemPanelProps> = ({ event, onUpdate, masterCatalog = 
                                     onChange={(e) => updateStat(idx, 'label', e.target.value)}
                                     className="admin-input flex-[1] text-[10px] font-black uppercase text-primary bg-primary/5 cursor-pointer"
                                 >
-                                    {quickOptions.map(opt => (
+                                    {statOptions.map(opt => (
                                         <option key={opt.label} value={opt.label} className="bg-zinc-900">{opt.label}</option>
                                     ))}
-                                    {!quickOptions.some(o => o.label === stat.label) && (
+                                    {!statOptions.some(o => o.label === stat.label) && (
                                         <option value={stat.label} className="bg-zinc-900">{stat.label}</option>
                                     )}
                                 </select>

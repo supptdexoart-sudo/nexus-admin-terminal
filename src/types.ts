@@ -299,6 +299,7 @@ export interface Character {
         oxygen: number;
     };
     perks: CharacterPerk[];
+    hullDamageChance?: number; // % šance na poškození trupu při skenování (0-100)
     timeVariant?: {
         enabled: boolean;
         nightModifiers: {

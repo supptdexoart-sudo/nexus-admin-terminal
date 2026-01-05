@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { Users, Database, Layout, ShieldCheck, ChevronRight, Search, PlusCircle, RefreshCcw, Menu, X } from 'lucide-react';
 import Generator from './components/Generator';
 import CharacterManagement from './components/CharacterManagement';
@@ -17,7 +17,11 @@ function App() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(localStorage.getItem('nexus_admin_user'));
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [characterRefreshFn, setCharacterRefreshFn] = useState<(() => void) | null>(null);
+  const characterRefreshRef = useRef<(() => void) | null>(null);
+
+  const handleSetRefreshFn = useCallback((fn: () => void) => {
+    characterRefreshRef.current = fn;
+  }, []);
 
   const AUTHORIZED_ADMIN = "zbynekbal97@gmail.com";
 
@@ -250,9 +254,9 @@ function App() {
                 onClick={() => {
                   if (activeTab === 'generator') {
                     loadCatalog();
-                  } else if (characterRefreshFn) {
+                  } else if (characterRefreshRef.current) {
                     setIsSyncing(true);
-                    characterRefreshFn();
+                    characterRefreshRef.current();
                     setTimeout(() => setIsSyncing(false), 500);
                   }
                 }}
@@ -349,7 +353,7 @@ function App() {
             {activeTab === 'characters' && (
               <CharacterManagement
                 userEmail={userEmail}
-                onRefreshReady={(fn) => setCharacterRefreshFn(() => fn)}
+                onRefreshReady={handleSetRefreshFn}
               />
             )}
           </section>

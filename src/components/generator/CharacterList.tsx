@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Edit, Trash2, QrCode, X, Search, ChevronRight, Shield, Sword, Heart } from 'lucide-react';
+import { Edit, Trash2, QrCode, X, Search, ChevronRight, Shield, Sword, Heart, AlertTriangle } from 'lucide-react';
 import type { Character } from '../../types';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -98,7 +98,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ characters, onEdit, onDel
                                         </p>
                                     )}
 
-                                    <div className="grid grid-cols-3 gap-3 mb-6">
+                                    <div className="grid grid-cols-4 gap-2 mb-6">
                                         <div className="bg-black/40 rounded-xl p-3 border border-white/5 flex flex-col items-center">
                                             <Heart size={12} className="text-red-500 mb-1 opacity-60" />
                                             <span className="text-sm font-black text-white">{char.baseStats.hp}</span>
@@ -113,6 +113,11 @@ const CharacterList: React.FC<CharacterListProps> = ({ characters, onEdit, onDel
                                             <Shield size={12} className="text-blue-500 mb-1 opacity-60" />
                                             <span className="text-sm font-black text-white">{char.baseStats.armor}</span>
                                             <span className="text-[8px] font-black text-zinc-600 uppercase">DEF</span>
+                                        </div>
+                                        <div className="bg-black/40 rounded-xl p-3 border border-white/5 flex flex-col items-center">
+                                            <AlertTriangle size={12} className="text-amber-500 mb-1 opacity-60" />
+                                            <span className="text-sm font-black text-white">{char.hullDamageChance ?? 0}%</span>
+                                            <span className="text-[8px] font-black text-zinc-600 uppercase">TRUP</span>
                                         </div>
                                     </div>
 

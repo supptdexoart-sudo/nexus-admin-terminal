@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { Character } from '../types';
 import * as apiService from '../services/apiService';
 import CharacterList from './generator/CharacterList';
@@ -17,7 +17,7 @@ const CharacterManagement: React.FC<CharacterManagementProps> = ({ userEmail, on
     const [showCreator, setShowCreator] = useState(false);
     const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-    const loadCharacters = async () => {
+    const loadCharacters = useCallback(async () => {
         try {
             console.log(`🔍 [CHARACTER] Fetching characters for admin: ${userEmail}`);
             const chars = await apiService.getCharacters(userEmail);
@@ -26,7 +26,7 @@ const CharacterManagement: React.FC<CharacterManagementProps> = ({ userEmail, on
         } catch (e: any) {
             console.error('❌ [CHARACTER] Failed to load characters:', e.message);
         }
-    };
+    }, [userEmail]);
 
     useEffect(() => {
         loadCharacters();
