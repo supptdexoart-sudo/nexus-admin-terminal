@@ -1,7 +1,7 @@
 import React from 'react';
 import { GameEventType } from '../../types';
 import type { GameEvent, BossPhase } from '../../types';
-import { Crown, Heart, Swords, Shield, Zap, X, Skull, Dice5, Wind, Target, Plus, ArrowRight } from 'lucide-react';
+import { Crown, Heart, Swords, Shield, Zap, X, Skull, Dice5, Wind, Target, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface CombatPanelProps {
@@ -35,6 +35,7 @@ const CombatPanel: React.FC<CombatPanelProps> = ({ event, onUpdate }) => {
             }
         });
     };
+
 
     // Boss Phase Logic
     const addBossPhase = () => {
@@ -83,7 +84,7 @@ const CombatPanel: React.FC<CombatPanelProps> = ({ event, onUpdate }) => {
                     <label className="admin-label text-center mb-2">{isTrap ? 'Obtížnost' : 'HP'}</label>
                     <input
                         type="number"
-                        placeholder="50"
+                        placeholder="0"
                         value={getSpecificStatValue('HP')}
                         onChange={(e) => setSpecificStat('HP', e.target.value)}
                         className="w-full bg-transparent text-center text-white font-black font-mono text-2xl outline-none"
@@ -94,7 +95,7 @@ const CombatPanel: React.FC<CombatPanelProps> = ({ event, onUpdate }) => {
                     <label className="admin-label text-center mb-2">{isTrap ? 'Poškození' : 'Útok'}</label>
                     <input
                         type="number"
-                        placeholder="10"
+                        placeholder="0"
                         value={getSpecificStatValue('ATK')}
                         onChange={(e) => setSpecificStat('ATK', e.target.value)}
                         className="w-full bg-transparent text-center text-white font-black font-mono text-2xl outline-none"
@@ -244,17 +245,13 @@ const CombatPanel: React.FC<CombatPanelProps> = ({ event, onUpdate }) => {
                         )}
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-white/5 pt-8">
+                    <div className="border-t border-white/5 pt-8">
                         <div className="flex items-start gap-4 p-4 bg-white/5 rounded-2xl">
                             <Dice5 size={20} className="text-zinc-500 mt-1" />
                             <div className="space-y-1">
                                 <h5 className="text-[10px] font-black text-white uppercase">MECHANIKY BOJE</h5>
                                 <p className="text-[9px] font-bold text-zinc-600 uppercase leading-relaxed">Brnění absorbuje poškození jako první. Obrana snižuje příchozí poškození. Slabina ignoruje obranu.</p>
                             </div>
-                        </div>
-                        <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/10">
-                            <span className="text-[10px] font-black text-primary uppercase">Generovat náhodnou raritní sadu?</span>
-                            <ArrowRight size={16} className="text-primary" />
                         </div>
                     </div>
                 </div>

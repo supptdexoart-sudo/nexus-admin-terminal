@@ -7,9 +7,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface TrapPanelProps {
     event: GameEvent;
     onUpdate: (updates: Partial<GameEvent>) => void;
+    characters?: any[];
 }
 
-const TrapPanel: React.FC<TrapPanelProps> = ({ event, onUpdate }) => {
+const TrapPanel: React.FC<TrapPanelProps> = ({ event, onUpdate, characters = [] }) => {
 
     const updateTrapConfig = (field: string, value: any) => {
         onUpdate({
@@ -129,7 +130,11 @@ const TrapPanel: React.FC<TrapPanelProps> = ({ event, onUpdate }) => {
                         className="admin-input text-[10px] uppercase font-black"
                     >
                         <option value="ANY">-- ŽÁDNÝ SPECIALISTA --</option>
-                        {Object.values(PlayerClass).map(c => <option key={c} value={c}>{c}</option>)}
+                        {characters.map(char => (
+                            <option key={char.characterId || char.id} value={char.name}>
+                                {char.name.toUpperCase()}
+                            </option>
+                        ))}
                     </select>
                 </div>
                 <div className="admin-card p-6 bg-black/40 space-y-4">

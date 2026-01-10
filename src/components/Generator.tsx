@@ -17,6 +17,7 @@ import EnemyLootPanel from './generator/EnemyLootPanel';
 import NightVariantPanel from './generator/NightVariantPanel';
 import SpaceStationPanel from './generator/SpaceStationPanel';
 import PlanetPanel from './generator/PlanetPanel';
+import ChestPanel from './generator/ChestPanel';
 
 interface GeneratorProps {
     onSaveCard: (event: GameEvent) => void;
@@ -25,6 +26,7 @@ interface GeneratorProps {
     onClearData?: () => void;
     onDelete?: (id: string) => void;
     masterCatalog?: GameEvent[];
+    characters?: any[];
     isSyncing?: boolean;
     onRefresh?: () => void;
 }
@@ -71,6 +73,7 @@ const ID_PREFIXES: Record<string, string> = {
     [GameEventType.BOSS]: 'BOSS-',
     [GameEventType.SPACE_STATION]: 'VS-',
     [GameEventType.PLANET]: 'PLA-',
+    [GameEventType.CHEST]: 'TRU-',
 };
 
 const Generator: React.FC<GeneratorProps> = ({
@@ -80,6 +83,7 @@ const Generator: React.FC<GeneratorProps> = ({
     onClearData,
     onDelete,
     masterCatalog = [],
+    characters = [],
     isSyncing = false,
     onRefresh
 }) => {
@@ -391,17 +395,18 @@ const Generator: React.FC<GeneratorProps> = ({
                     {/* MODULAR CONTENT PANEL */}
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                         {newEvent.type === GameEventType.ITEM && <ItemPanel event={newEvent} onUpdate={updateEvent} masterCatalog={masterCatalog} />}
-                        {newEvent.type === GameEventType.TRAP && <TrapPanel event={newEvent} onUpdate={updateEvent} />}
+                        {newEvent.type === GameEventType.TRAP && <TrapPanel event={newEvent} onUpdate={updateEvent} characters={characters} />}
                         {(newEvent.type === GameEventType.ENCOUNTER || newEvent.type === GameEventType.BOSS) && (
                             <div className="space-y-8">
                                 <CombatPanel event={newEvent} onUpdate={updateEvent} />
                                 {newEvent.type === GameEventType.ENCOUNTER && <EnemyLootPanel event={newEvent} onUpdate={updateEvent} />}
                             </div>
                         )}
-                        {newEvent.type === GameEventType.MERCHANT && <MerchantPanel event={newEvent} onUpdate={updateEvent} />}
+                        {newEvent.type === GameEventType.MERCHANT && <MerchantPanel event={newEvent} onUpdate={updateEvent} characters={characters} masterCatalog={masterCatalog} />}
                         {newEvent.type === GameEventType.SPACE_STATION && <SpaceStationPanel event={newEvent} onUpdate={updateEvent} />}
                         {newEvent.type === GameEventType.PLANET && <PlanetPanel event={newEvent} onUpdate={updateEvent} masterCatalog={masterCatalog} />}
                         {newEvent.type === GameEventType.DILEMA && <DilemmaPanel event={newEvent} onUpdate={updateEvent} />}
+                        {newEvent.type === GameEventType.CHEST && <ChestPanel event={newEvent} onUpdate={updateEvent} masterCatalog={masterCatalog} />}
 
                         <div className="mt-8">
                             <NightVariantPanel event={newEvent} onUpdate={updateEvent} />

@@ -40,7 +40,7 @@ const EnemyLootPanel: React.FC<EnemyLootPanelProps> = ({ event, onUpdate }) => {
         { label: 'ZLATO', icon: Coins, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
         { label: 'HP', icon: Heart, color: 'text-red-500', bg: 'bg-red-500/10' },
         { label: 'PALIVO', icon: Fuel, color: 'text-orange-500', bg: 'bg-orange-500/10' },
-        { label: 'O2', icon: Wind, color: 'text-cyan-400', bg: 'bg-cyan-400/10' },
+        { label: 'KYSLÍK', icon: Wind, color: 'text-cyan-400', bg: 'bg-cyan-400/10' },
     ];
 
     return (
@@ -104,14 +104,6 @@ const EnemyLootPanel: React.FC<EnemyLootPanelProps> = ({ event, onUpdate }) => {
                                 <span className="text-[10px] font-black uppercase text-zinc-400 group-hover:text-white relative z-10">{opt.label}</span>
                             </button>
                         ))}
-                        <button
-                            type="button"
-                            onClick={() => addLootStat('CUSTOM')}
-                            className="flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/30 rounded-xl hover:bg-primary/20 transition-all active:scale-95 text-primary group"
-                        >
-                            <Plus size={12} />
-                            <span className="text-[10px] font-black uppercase">Vlastní</span>
-                        </button>
                     </div>
                 </div>
 

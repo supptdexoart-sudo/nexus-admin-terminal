@@ -7,7 +7,8 @@ export enum GameEventType {
     DILEMA = 'DILEMA',
     BOSS = 'BOSS',
     SPACE_STATION = 'VESMÍRNÁ_STANICE',
-    PLANET = 'PLANETA'
+    PLANET = 'PLANETA',
+    CHEST = 'TRUHLA'
 }
 
 export enum PlayerClass {
@@ -28,11 +29,12 @@ export interface MerchantItemEntry {
     stock: number;
     price?: number;
     sellPrice?: number;
-    saleChance?: number; // ADDED: Šance v % že bude item ve slevě
+    saleChance?: number;
+    allowBuy?: boolean; // NEW: Jestli obchodník tento předmět vykupuje
 }
 
 export interface DilemmaReward {
-    type: 'HP' | 'GOLD'; // REMOVED XP, MANA
+    type: 'HP' | 'GOLD' | 'FUEL' | 'OXYGEN' | 'HULL' | 'ARMOR';
     value: number;
 }
 
@@ -193,6 +195,7 @@ export interface GameEvent {
     isSellOnly?: boolean;
     canBeSaved?: boolean;
     isLocked?: boolean;
+    requiredKeyId?: string;
 
     price?: number;
 

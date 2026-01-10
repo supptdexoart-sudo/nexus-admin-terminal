@@ -12,8 +12,10 @@ type Tab = 'generator' | 'characters';
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('generator');
   const [masterCatalog, setMasterCatalog] = useState<GameEvent[]>([]);
+  const [characters, setCharacters] = useState<any[]>([]);
   const [editingEvent, setEditingEvent] = useState<GameEvent | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState<string>('ALL');
   const [isSyncing, setIsSyncing] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(localStorage.getItem('nexus_admin_user'));
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -66,11 +68,28 @@ function App() {
     return () => window.removeEventListener('beforeunload', handleUnload);
   }, []);
 
-  useEffect(() => {
-    if (userEmail?.toLowerCase() === AUTHORIZED_ADMIN.toLowerCase()) {
-      loadCatalog();
+  const loadData = useCallback(async () => {
+    if (!userEmail) return;
+    setIsSyncing(true);
+    try {
+      const [catalog, chars] = await Promise.all([
+        apiService.getMasterCatalog(userEmail),
+        apiService.getCharacters(userEmail)
+      ]);
+      setMasterCatalog(catalog);
+      setCharacters(chars);
+    } catch (e) {
+      console.error("Failed to load data", e);
+    } finally {
+      setIsSyncing(false);
     }
   }, [userEmail]);
+
+  useEffect(() => {
+    if (userEmail?.toLowerCase() === AUTHORIZED_ADMIN.toLowerCase()) {
+      loadData();
+    }
+  }, [userEmail, loadData]);
 
   const handleLogin = (email: string) => {
     localStorage.setItem('nexus_admin_user', email);
@@ -92,26 +111,13 @@ function App() {
     setUserEmail(null);
   };
 
-  const loadCatalog = async () => {
-    if (!userEmail) return;
-    setIsSyncing(true);
-    try {
-      const catalog = await apiService.getMasterCatalog(userEmail);
-      setMasterCatalog(catalog);
-    } catch (e) {
-      console.error("Failed to load catalog", e);
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
   const handleSaveCard = async (event: GameEvent) => {
     if (!userEmail) return;
     try {
       await apiService.saveCard(userEmail, event);
       // Malé zpoždění pro zajištění zápisu do DB před načtením
       await new Promise(resolve => setTimeout(resolve, 300));
-      await loadCatalog();
+      await loadData();
       setEditingEvent(null);
     } catch (e) {
       console.error("Failed to save card", e);
@@ -125,17 +131,19 @@ function App() {
       await apiService.deleteCard(userEmail, id);
       // Malé zpoždění pro zajištění smazání v DB
       await new Promise(resolve => setTimeout(resolve, 300));
-      await loadCatalog();
+      await loadData();
       setEditingEvent(null);
     } catch (e) {
       console.error("Failed to delete card", e);
     }
   };
 
-  const filteredCatalog = masterCatalog.filter(item =>
-    item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.id.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredCatalog = masterCatalog.filter(item => {
+    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.id.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = typeFilter === 'ALL' || item.type === typeFilter;
+    return matchesSearch && matchesType;
+  });
 
   if (!userEmail || userEmail.toLowerCase() !== AUTHORIZED_ADMIN.toLowerCase()) {
     return <LoginScreen onLogin={handleLogin} onLogout={handleLogout} />;
@@ -253,7 +261,7 @@ function App() {
               <button
                 onClick={() => {
                   if (activeTab === 'generator') {
-                    loadCatalog();
+                    loadData();
                   } else if (characterRefreshRef.current) {
                     setIsSyncing(true);
                     characterRefreshRef.current();
@@ -307,6 +315,26 @@ function App() {
                       />
                     </div>
 
+                    {/* Mobile Type Filter */}
+                    <div className="mb-4">
+                      <select
+                        value={typeFilter}
+                        onChange={(e) => setTypeFilter(e.target.value)}
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white focus:border-primary focus:outline-none transition-all appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M5%207L10%2012L15%207%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E')] bg-[length:20px_20px] bg-[right_10px_center] bg-no-repeat"
+                      >
+                        <option value="ALL" style={{ color: '#000' }}>Všechny Typy</option>
+                        <option value="PŘEDMĚT" style={{ color: '#000' }}>PŘEDMĚT</option>
+                        <option value="SETKÁNÍ" style={{ color: '#000' }}>SETKÁNÍ</option>
+                        <option value="NÁSTRAHA" style={{ color: '#000' }}>NÁSTRAHA</option>
+                        <option value="OBCHODNÍK" style={{ color: '#000' }}>OBCHODNÍK</option>
+                        <option value="DILEMA" style={{ color: '#000' }}>DILEMA</option>
+                        <option value="BOSS" style={{ color: '#000' }}>BOSS</option>
+                        <option value="VESMÍRNÁ_STANICE" style={{ color: '#000' }}>VESMÍRNÁ STANICE</option>
+                        <option value="PLANETA" style={{ color: '#000' }}>PLANETA</option>
+                        <option value="TRUHLA" style={{ color: '#000' }}>TRUHLA</option>
+                      </select>
+                    </div>
+
                     {/* Asset List */}
                     <div className="space-y-2 max-h-96 overflow-y-auto">
                       {filteredCatalog.map((item: GameEvent) => (
@@ -345,8 +373,9 @@ function App() {
                   onClearData={() => setEditingEvent(null)}
                   onDelete={handleDeleteCard}
                   masterCatalog={masterCatalog}
+                  characters={characters}
                   isSyncing={isSyncing}
-                  onRefresh={loadCatalog}
+                  onRefresh={loadData}
                 />
               </>
             )}
@@ -361,12 +390,32 @@ function App() {
           {/* RIGHT SIDEBAR (Catalog List) */}
           {activeTab === 'generator' && (
             <aside className="w-80 border-l border-white/5 bg-black/20 hidden xl:flex flex-col">
-              <div className="p-6 border-b border-white/5 flex items-center justify-between shadow-xl">
-                <div className="flex items-center gap-2">
-                  <Database size={16} className="text-primary" />
-                  <h3 className="font-bold text-sm text-white uppercase tracking-wider">Registr Assetů</h3>
+              <div className="p-6 border-b border-white/5 shadow-xl">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Database size={16} className="text-primary" />
+                    <h3 className="font-bold text-sm text-white uppercase tracking-wider">Registr Assetů</h3>
+                  </div>
+                  <span className="bg-primary/10 text-primary text-[10px] font-black px-2 py-0.5 rounded-full">{filteredCatalog.length}</span>
                 </div>
-                <span className="bg-primary/10 text-primary text-[10px] font-black px-2 py-0.5 rounded-full">{filteredCatalog.length}</span>
+
+                {/* Desktop Type Filter */}
+                <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:border-primary focus:outline-none transition-all appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M5%207L10%2012L15%207%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E')] bg-[length:20px_20px] bg-[right_10px_center] bg-no-repeat"
+                >
+                  <option value="ALL" style={{ color: '#000' }}>Všechny Typy</option>
+                  <option value="PŘEDMĚT" style={{ color: '#000' }}>PŘEDMĚT</option>
+                  <option value="SETKÁNÍ" style={{ color: '#000' }}>SETKÁNÍ</option>
+                  <option value="NÁSTRAHA" style={{ color: '#000' }}>NÁSTRAHA</option>
+                  <option value="OBCHODNÍK" style={{ color: '#000' }}>OBCHODNÍK</option>
+                  <option value="DILEMA" style={{ color: '#000' }}>DILEMA</option>
+                  <option value="BOSS" style={{ color: '#000' }}>BOSS</option>
+                  <option value="VESMÍRNÁ_STANICE" style={{ color: '#000' }}>VESMÍRNÁ STANICE</option>
+                  <option value="PLANETA" style={{ color: '#000' }}>PLANETA</option>
+                  <option value="TRUHLA" style={{ color: '#000' }}>TRUHLA</option>
+                </select>
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 space-y-2 no-scrollbar">

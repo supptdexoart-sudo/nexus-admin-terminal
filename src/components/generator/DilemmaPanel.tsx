@@ -1,6 +1,6 @@
 import React from 'react';
 import type { GameEvent, DilemmaOption, DilemmaReward } from '../../types';
-import { Split, User, Globe, Skull, AlertTriangle, ArrowRight, Plus, Trash2, CheckCircle, HelpCircle } from 'lucide-react';
+import { Trash2, Zap, Split, User, Globe, Heart, Coins, Fuel, Wind, Box, ShieldPlus, CheckCircle, Skull, AlertTriangle, ArrowRight, HelpCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface DilemmaPanelProps {
@@ -9,6 +9,14 @@ interface DilemmaPanelProps {
 }
 
 const DilemmaPanel: React.FC<DilemmaPanelProps> = ({ event, onUpdate }) => {
+    const quickRewardOptions = [
+        { label: 'HP', type: 'HP', icon: Heart, color: 'text-red-500', bg: 'bg-red-500/10' },
+        { label: 'GOLD', type: 'GOLD', icon: Coins, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
+        { label: 'PALIVO', type: 'FUEL', icon: Fuel, color: 'text-orange-500', bg: 'bg-orange-500/10' },
+        { label: 'KYSLÍK', type: 'OXYGEN', icon: Wind, color: 'text-cyan-400', bg: 'bg-cyan-400/10' },
+        { label: 'TRUP', type: 'HULL', icon: Box, color: 'text-zinc-400', bg: 'bg-zinc-400/10' },
+        { label: 'ŠTÍTY', type: 'ARMOR', icon: ShieldPlus, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+    ];
 
     const addDilemmaOption = () => {
         const newOption: DilemmaOption = {
@@ -37,16 +45,6 @@ const DilemmaPanel: React.FC<DilemmaPanelProps> = ({ event, onUpdate }) => {
         });
     };
 
-    // Reward Management Helpers
-    const addReward = (optIndex: number) => {
-        const options = [...(event.dilemmaOptions || [])];
-        if (!options[optIndex].rewards) {
-            options[optIndex].rewards = [];
-        }
-        options[optIndex].rewards!.push({ type: 'GOLD', value: 10 });
-        onUpdate({ dilemmaOptions: options });
-    };
-
     const updateReward = (optIndex: number, rewIndex: number, field: keyof DilemmaReward, value: any) => {
         const options = [...(event.dilemmaOptions || [])];
         if (options[optIndex].rewards) {
@@ -65,7 +63,6 @@ const DilemmaPanel: React.FC<DilemmaPanelProps> = ({ event, onUpdate }) => {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-
             {/* SUBHEADER INDICATOR */}
             <div className="flex items-center gap-3 bg-black/40 p-4 rounded-2xl border border-white/5 backdrop-blur-md">
                 <div className="p-2 bg-purple-500/20 rounded-xl text-purple-500">
@@ -86,7 +83,7 @@ const DilemmaPanel: React.FC<DilemmaPanelProps> = ({ event, onUpdate }) => {
                         </label>
                         <p className="text-[10px] font-bold text-zinc-600 uppercase">Určuje, zda dopad pocítí jeden hráč, nebo celá posádka</p>
                     </div>
-                    <div className="flex p-1 bg-black/60 rounded-2xl border border-white/5">
+                    <div className="flex p-1 bg-black/60 rounded-2xl border border-white/5 font-sans">
                         <button
                             type="button"
                             onClick={() => onUpdate({ dilemmaScope: 'INDIVIDUAL' })}
@@ -161,7 +158,7 @@ const DilemmaPanel: React.FC<DilemmaPanelProps> = ({ event, onUpdate }) => {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     {/* SUCCESS COLUMN */}
-                                    <div className="space-y-4">
+                                    <div className="space-y-6">
                                         <div className="flex items-center gap-2 border-b border-green-500/20 pb-2">
                                             <CheckCircle size={14} className="text-green-500" />
                                             <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">Při úspěchu</span>
@@ -173,47 +170,75 @@ const DilemmaPanel: React.FC<DilemmaPanelProps> = ({ event, onUpdate }) => {
                                             placeholder="Popište, co se stane v případě úspěchu..."
                                         />
 
-                                        <div className="space-y-3">
-                                            <label className="text-[9px] font-black text-zinc-600 uppercase">Odměny a Benefity</label>
+                                        {/* REWARD CONFIGURATION */}
+                                        <div className="space-y-4">
                                             <div className="space-y-2">
-                                                {opt.rewards?.map((rew, rIdx) => (
-                                                    <div key={rIdx} className="flex gap-2 animate-in slide-in-from-left-1">
-                                                        <select
-                                                            value={rew.type}
-                                                            onChange={(e) => updateReward(idx, rIdx, 'type', e.target.value)}
-                                                            className="admin-input py-2 flex-1 text-[10px] font-black uppercase"
-                                                        >
-                                                            <option value="HP">OBNOVA HP</option>
-                                                            <option value="GOLD">KREDITY / ZLATO</option>
-                                                        </select>
-                                                        <input
-                                                            type="number"
-                                                            value={rew.value}
-                                                            onChange={(e) => updateReward(idx, rIdx, 'value', parseInt(e.target.value))}
-                                                            className="admin-input py-2 w-20 text-center font-mono"
-                                                        />
+                                                <label className="admin-label text-zinc-500 text-[9px]">Rychlé přidání odměny</label>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {quickRewardOptions.map(optGroup => (
                                                         <button
+                                                            key={optGroup.type}
                                                             type="button"
-                                                            onClick={() => removeReward(idx, rIdx)}
-                                                            className="p-2 text-zinc-600 hover:text-red-500 transition-all"
+                                                            onClick={() => {
+                                                                const newOptions = [...(event.dilemmaOptions || [])];
+                                                                const currentRewards = newOptions[idx].rewards || [];
+                                                                newOptions[idx].rewards = [...currentRewards, { type: optGroup.type as any, value: 10 }];
+                                                                onUpdate({ dilemmaOptions: newOptions });
+                                                            }}
+                                                            className="flex items-center gap-2 px-3 py-1.5 bg-black/40 border border-white/5 rounded-lg hover:border-white/20 hover:bg-white/5 transition-all active:scale-95 group relative overflow-hidden"
                                                         >
-                                                            <Trash2 size={14} />
+                                                            <div className={`absolute inset-0 ${optGroup.bg} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                                                            <optGroup.icon size={12} className={`${optGroup.color} relative z-10`} />
+                                                            <span className="text-[9px] font-black uppercase text-zinc-500 group-hover:text-white relative z-10">{optGroup.label}</span>
                                                         </button>
-                                                    </div>
-                                                ))}
-                                                <button
-                                                    type="button"
-                                                    onClick={() => addReward(idx)}
-                                                    className="w-full py-2 bg-green-500/5 hover:bg-green-500/10 border border-green-500/30 text-green-500 text-[10px] font-black uppercase rounded-xl transition-all flex items-center justify-center gap-2"
-                                                >
-                                                    <Plus size={14} /> Přidat Odměnu
-                                                </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-3">
+                                                <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Nastavené odměny</label>
+                                                <div className="space-y-2">
+                                                    {opt.rewards?.map((rew, rIdx) => {
+                                                        const foundOption = quickRewardOptions.find(o => o.type === rew.type);
+                                                        return (
+                                                            <div key={rIdx} className="admin-card p-2 bg-black/60 flex items-center gap-3 border-white/5 group hover:border-white/10 transition-all">
+                                                                <div className={`p-2 rounded-lg ${foundOption ? foundOption.bg : 'bg-white/5'} flex items-center justify-center`}>
+                                                                    {foundOption ? <foundOption.icon size={14} className={foundOption.color} /> : <Zap size={14} className="text-zinc-500" />}
+                                                                </div>
+                                                                <div className="flex-1 flex items-center gap-3">
+                                                                    <span className="text-[10px] font-black text-white uppercase flex-1">{foundOption?.label || rew.type}</span>
+                                                                    <div className="flex items-center gap-2 bg-black/40 px-2 rounded border border-white/5">
+                                                                        <span className="text-[10px] text-zinc-600 font-mono">VAL:</span>
+                                                                        <input
+                                                                            type="number"
+                                                                            value={rew.value}
+                                                                            onChange={(e) => updateReward(idx, rIdx, 'value', parseInt(e.target.value))}
+                                                                            className="bg-transparent text-xs font-mono font-bold text-primary w-16 outline-none py-1"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => removeReward(idx, rIdx)}
+                                                                    className="p-2 text-zinc-700 hover:text-red-500 transition-all rounded hover:bg-red-500/10"
+                                                                >
+                                                                    <Trash2 size={14} />
+                                                                </button>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                    {(!opt.rewards || opt.rewards.length === 0) && (
+                                                        <div className="text-center py-4 border border-dashed border-white/5 rounded-lg opacity-50">
+                                                            <p className="text-[9px] font-black text-zinc-700 uppercase">Žádné odměny nebyly přidány</p>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* FAIL COLUMN */}
-                                    <div className={`space-y-4 transition-all duration-500 ${opt.successChance === 100 ? 'opacity-20 grayscale' : 'opacity-100'}`}>
+                                    <div className={`space-y-6 transition-all duration-500 ${opt.successChance === 100 ? 'opacity-20 grayscale' : 'opacity-100'}`}>
                                         <div className="flex items-center gap-2 border-b border-red-500/20 pb-2">
                                             <Skull size={14} className="text-red-500" />
                                             <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Při selhání</span>
@@ -247,7 +272,7 @@ const DilemmaPanel: React.FC<DilemmaPanelProps> = ({ event, onUpdate }) => {
                                         <input
                                             value={opt.physicalInstruction || ''}
                                             onChange={(e) => updateOption(idx, { physicalInstruction: e.target.value })}
-                                            className="admin-input py-4 pl-12 text-xs text-yellow-500 border-yellow-500/10 focus:border-yellow-500/30"
+                                            className="admin-input py-4 pl-12 text-xs text-yellow-500 border-yellow-500/10 focus:border-yellow-500/30 uppercase font-bold"
                                             placeholder="NAPŘ. POSUŇ FIGURKU O 3 POLÍČKA ZPĚT..."
                                         />
                                         <ArrowRight size={16} className="absolute left-6 top-1/2 -translate-y-1/2 text-yellow-500 opacity-40" />
@@ -261,13 +286,12 @@ const DilemmaPanel: React.FC<DilemmaPanelProps> = ({ event, onUpdate }) => {
                 <button
                     type="button"
                     onClick={addDilemmaOption}
-                    className="admin-button-secondary w-full py-5 rounded-3xl border-dashed border-2 flex items-center justify-center gap-3 group"
+                    className="admin-button-secondary w-full py-5 rounded-3xl border-dashed border-2 flex items-center justify-center gap-3 group bg-purple-500/5 border-purple-500/20 text-purple-500/60 hover:text-purple-500 hover:border-purple-500/50 transition-all font-black uppercase text-xs"
                 >
                     <Split size={18} className="group-hover:rotate-90 transition-all duration-500" />
                     <span>Inicializovat novou větev osudu</span>
                 </button>
             </div>
-
         </div>
     );
 };
