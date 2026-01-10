@@ -1,6 +1,6 @@
 import React from 'react';
 import type { GameEvent, Stat } from '../../types';
-import { Coins, Heart, Fuel, Wind, Sparkles, Trash2, Plus, Box, Percent, Target } from 'lucide-react';
+import { Coins, Heart, Fuel, Wind, Sparkles, Trash2, Box, Percent, Target } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface EnemyLootPanelProps {
