@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { X, Plus, Trash2, Save, User, FileText, Zap, Shield, Swords, Heart, Moon, Fuel, Coins, Wind, AlertTriangle } from 'lucide-react';
-import type { Character, CharacterPerk } from '../../types';
+import React, { useState, useEffect } from 'react';
+import { X, Plus, Trash2, Save, User, FileText, Zap, Shield, Heart, Moon, Coins, Rocket, AlertTriangle } from 'lucide-react';
+import type { Character, CharacterPerk, Ship } from '../../types';
+import * as apiService from '../../services/apiService';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface CharacterCreatorProps {
@@ -28,7 +29,6 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, 
             baseStats: {
                 hp: 100,
                 armor: 0,
-                damage: 10,
                 fuel: 100,
                 gold: 0,
                 oxygen: 100
@@ -45,7 +45,21 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, 
         };
     });
 
+    const [availableShips, setAvailableShips] = useState<Ship[]>([]);
     const [isSaving, setIsSaving] = useState(false);
+
+    useEffect(() => {
+        const loadAvailableShips = async () => {
+            const email = localStorage.getItem('nexus_admin_user') || 'zbynekbal97@gmail.com';
+            try {
+                const ships = await apiService.getShips(email);
+                setAvailableShips(ships);
+            } catch (e) {
+                console.error("Failed to load ships for selection", e);
+            }
+        };
+        loadAvailableShips();
+    }, []);
 
     const handleStatChange = (stat: keyof Character['baseStats'], value: number) => {
         setFormData(prev => ({
@@ -61,7 +75,7 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, 
                 name: '',
                 description: '',
                 effect: {
-                    stat: 'damage',
+                    stat: 'hp',
                     modifier: 0,
                     condition: 'always'
                 }
@@ -147,22 +161,86 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, 
                                 />
                             </div>
 
-                            <div className="space-y-2 opacity-50">
-                                <label className="admin-label">Systémové ID (Automaticky)</label>
-                                <div className="admin-input bg-black/40 text-zinc-500 font-mono text-xs flex items-center">
-                                    {character ? character.characterId : 'GENEROVÁNO PŘI ULOŽENÍ'}
-                                </div>
+                            <div className="space-y-2">
+                                <label className="admin-label">Počáteční Loď</label>
+                                <select
+                                    value={formData.initialShipId || ''}
+                                    onChange={(e) => setFormData({ ...formData, initialShipId: e.target.value })}
+                                    className="admin-input font-black uppercase tracking-widest text-primary"
+                                >
+                                    <option value="">-- ŽÁDNÁ LOĎ --</option>
+                                    {availableShips.map(ship => (
+                                        <option key={ship.shipId} value={ship.shipId}>
+                                            {ship.name} ({ship.rarity})
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
 
-                            <div className="md:col-span-2 space-y-2">
-                                <label className="admin-label">Popis / Služební Záznam</label>
-                                <textarea
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    className="admin-input h-24 resize-none"
-                                    placeholder="Zadejte biografické nebo technické údaje..."
-                                />
+                            {/* SHIP PREVIEW */}
+                            <div className="md:col-span-2">
+                                <AnimatePresence mode="wait">
+                                    {formData.initialShipId ? (
+                                        <motion.div
+                                            key={formData.initialShipId}
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="p-4 bg-primary/5 border border-primary/20 rounded-2xl flex items-center justify-between"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="p-2 bg-primary/10 rounded-xl">
+                                                    <Rocket size={20} className="text-primary" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-primary mb-1">Konfigurace plavidla</h4>
+                                                    <p className="text-xs font-bold text-white uppercase">
+                                                        {availableShips.find(s => s.shipId === formData.initialShipId)?.name || 'Neznámá loď'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-8 px-6 border-l border-white/5">
+                                                <div className="text-center">
+                                                    <div className="text-[8px] font-black text-zinc-500 uppercase mb-1">Hull</div>
+                                                    <div className="text-sm font-black text-white">{availableShips.find(s => s.shipId === formData.initialShipId)?.baseStats.hull || 0}</div>
+                                                </div>
+                                                <div className="text-center">
+                                                    <div className="text-[8px] font-black text-zinc-500 uppercase mb-1">Fuel</div>
+                                                    <div className="text-sm font-black text-white">{availableShips.find(s => s.shipId === formData.initialShipId)?.baseStats.fuelCapacity || 0}</div>
+                                                </div>
+                                                <div className="text-center">
+                                                    <div className="text-[8px] font-black text-zinc-500 uppercase mb-1">O2</div>
+                                                    <div className="text-sm font-black text-white">{availableShips.find(s => s.shipId === formData.initialShipId)?.baseStats.oxygenCapacity || 0}</div>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            className="p-4 bg-white/5 border border-dashed border-white/10 rounded-2xl text-center"
+                                        >
+                                            <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Vyberte počáteční loď pro zobrazení statistik</p>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
+                        </div>
+
+                        <div className="space-y-2 opacity-50">
+                            <label className="admin-label">Systémové ID (Automaticky)</label>
+                            <div className="admin-input bg-black/40 text-zinc-500 font-mono text-xs flex items-center">
+                                {character ? character.characterId : 'GENEROVÁNO PŘI ULOŽENÍ'}
+                            </div>
+                        </div>
+
+                        <div className="md:col-span-2 space-y-2">
+                            <label className="admin-label">Popis / Služební Záznam</label>
+                            <textarea
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                className="admin-input h-24 resize-none"
+                                placeholder="Zadejte biografické nebo technické údaje..."
+                            />
                         </div>
                     </div>
 
@@ -173,14 +251,12 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, 
                             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Základní statistiky postavy:</h3>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {[
-                                { id: 'hp', label: 'Zdraví (HP)', icon: Heart, iconColor: 'text-red-500', value: formData.baseStats.hp },
-                                { id: 'armor', label: 'Brnění (ARM)', icon: Shield, iconColor: 'text-blue-500', value: formData.baseStats.armor },
-                                { id: 'damage', label: 'Útok (DMG)', icon: Swords, iconColor: 'text-orange-500', value: formData.baseStats.damage },
-                                { id: 'fuel', label: 'Palivo (FUEL)', icon: Fuel, iconColor: 'text-amber-500', value: formData.baseStats.fuel },
-                                { id: 'gold', label: 'Kredity (GOLD)', icon: Coins, iconColor: 'text-yellow-500', value: formData.baseStats.gold },
-                                { id: 'oxygen', label: 'Kyslík (O2)', icon: Wind, iconColor: 'text-cyan-500', value: formData.baseStats.oxygen }
+                                { id: 'hp', label: 'Zdraví (HP)', icon: Heart, iconColor: 'text-red-500', value: formData.baseStats.hp, isBaseStat: true },
+                                { id: 'armor', label: 'Brnění (ARM)', icon: Shield, iconColor: 'text-blue-500', value: formData.baseStats.armor, isBaseStat: true },
+                                { id: 'hullDamageChance', label: 'Šance na dmg TRUPu (%)', icon: AlertTriangle, iconColor: 'text-amber-500', value: formData.hullDamageChance, isBaseStat: false },
+                                { id: 'gold', label: 'Kredity (GOLD)', icon: Coins, iconColor: 'text-yellow-500', value: formData.baseStats.gold, isBaseStat: true }
                             ].map((stat) => (
                                 <div key={stat.id} className="admin-card p-4 bg-black/40 border-white/5 flex flex-col gap-4">
                                     <div className="flex items-center gap-3">
@@ -190,7 +266,14 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, 
                                     <input
                                         type="number"
                                         value={stat.value}
-                                        onChange={(e) => handleStatChange(stat.id as any, parseInt(e.target.value) || 0)}
+                                        onChange={(e) => {
+                                            const val = parseInt(e.target.value) || 0;
+                                            if (stat.isBaseStat) {
+                                                handleStatChange(stat.id as any, val);
+                                            } else {
+                                                setFormData(prev => ({ ...prev, [stat.id]: val }));
+                                            }
+                                        }}
                                         className="bg-transparent border-none p-0 text-3xl font-black text-white focus:ring-0 w-full"
                                     />
                                 </div>
@@ -198,47 +281,6 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, 
                         </div>
                     </div>
 
-                    {/* Section: Hull Damage Chance */}
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-3">
-                            <AlertTriangle size={16} className="text-red-500 opacity-60" />
-                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Poškození Trupu Lodi:</h3>
-                        </div>
-
-                        <div className="admin-card p-6 bg-black/40 border-white/5">
-                            <div className="flex items-center gap-4 mb-4">
-                                <AlertTriangle size={24} className="text-red-500" />
-                                <div className="flex-1">
-                                    <label className="admin-label mb-1">% Šance na poškození trupu při skenování karty</label>
-                                    <p className="text-[10px] text-zinc-600 uppercase tracking-widest">Při každém skenování se provede kontrola - pokud náhodné číslo je menší než tato hodnota, trup lodi se poškodí o -5 bodů.</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-6">
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max="100"
-                                    value={formData.hullDamageChance || 0}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, hullDamageChance: parseInt(e.target.value) }))}
-                                    className="flex-1 h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer"
-                                    style={{
-                                        background: `linear-gradient(to right, #ef4444 0%, #ef4444 ${formData.hullDamageChance || 0}%, #27272a ${formData.hullDamageChance || 0}%, #27272a 100%)`
-                                    }}
-                                />
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        value={formData.hullDamageChance || 0}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, hullDamageChance: Math.min(100, Math.max(0, parseInt(e.target.value) || 0)) }))}
-                                        className="admin-input w-20 text-center text-2xl font-black text-red-500"
-                                    />
-                                    <span className="text-xl font-black text-zinc-600">%</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     {/* Section: Perks */}
                     <div className="space-y-6">
@@ -291,9 +333,9 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, 
                                                         onChange={(e) => updatePerk(index, { ...perk, effect: { ...perk.effect, stat: e.target.value } })}
                                                         className="admin-input text-[10px] uppercase font-bold"
                                                     >
-                                                        <option value="damage">+ÚTOČNÁ SÍLA</option>
                                                         <option value="hp">+ZDRAVÍ</option>
                                                         <option value="armor">+Brnění</option>
+                                                        <option value="hullDamageChance">+TRUP (% Šance)</option>
                                                     </select>
                                                 </div>
                                                 <div className="space-y-2">
@@ -377,7 +419,6 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ character, onSave, 
                             </div>
                         </label>
                     </div>
-
                 </div>
 
                 {/* FOOTER ACTIONS */}

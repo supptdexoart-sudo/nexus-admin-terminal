@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Users, Database, Layout, ShieldCheck, ChevronRight, Search, PlusCircle, RefreshCcw, Menu, X } from 'lucide-react';
+import { Users, Database, Layout, ShieldCheck, ChevronRight, Search, PlusCircle, RefreshCcw, Menu, X, Rocket } from 'lucide-react';
 import Generator from './components/Generator';
 import CharacterManagement from './components/CharacterManagement';
+import ShipManagement from './components/ShipManagement';
 import LoginScreen from './components/LoginScreen';
 import type { GameEvent } from './types';
 import * as apiService from './services/apiService';
 import './App.css';
 
-type Tab = 'generator' | 'characters';
+type Tab = 'generator' | 'characters' | 'ships';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('generator');
@@ -20,9 +21,14 @@ function App() {
   const [userEmail, setUserEmail] = useState<string | null>(localStorage.getItem('nexus_admin_user'));
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const characterRefreshRef = useRef<(() => void) | null>(null);
+  const shipRefreshRef = useRef<(() => void) | null>(null);
 
   const handleSetRefreshFn = useCallback((fn: () => void) => {
     characterRefreshRef.current = fn;
+  }, []);
+
+  const handleSetShipRefreshFn = useCallback((fn: () => void) => {
+    shipRefreshRef.current = fn;
   }, []);
 
   const AUTHORIZED_ADMIN = "zbynekbal97@gmail.com";
@@ -206,6 +212,16 @@ function App() {
             <Users size={20} className={activeTab === 'characters' ? 'text-primary' : 'group-hover:text-white'} />
             <span className="font-bold text-sm uppercase tracking-wide">Postavy</span>
           </button>
+
+          <button
+            onClick={() => { setActiveTab('ships'); setIsMobileMenuOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all group ${activeTab === 'ships'
+              ? 'bg-primary/10 text-primary border border-primary/20 shadow-neon'
+              : 'hover:bg-white/5 text-zinc-500 hover:text-white border border-transparent'}`}
+          >
+            <Rocket size={20} className={activeTab === 'ships' ? 'text-primary' : 'group-hover:text-white'} />
+            <span className="font-bold text-sm uppercase tracking-wide">Lodě</span>
+          </button>
         </nav>
 
         <div className="p-4 border-t border-white/5">
@@ -229,7 +245,7 @@ function App() {
             </div>
             <div>
               <h2 className="text-lg font-bold text-white uppercase tracking-tight leading-none mb-1">
-                {activeTab === 'generator' ? 'Modul Fabrikace' : 'Správa Postav'}
+                {activeTab === 'generator' ? 'Modul Fabrikace' : activeTab === 'characters' ? 'Správa Postav' : 'Fabrikace Lodí'}
               </h2>
               <div className="flex items-center gap-3">
                 <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest flex items-center gap-1">
@@ -262,9 +278,13 @@ function App() {
                 onClick={() => {
                   if (activeTab === 'generator') {
                     loadData();
-                  } else if (characterRefreshRef.current) {
+                  } else if (activeTab === 'characters' && characterRefreshRef.current) {
                     setIsSyncing(true);
                     characterRefreshRef.current();
+                    setTimeout(() => setIsSyncing(false), 500);
+                  } else if (activeTab === 'ships' && shipRefreshRef.current) {
+                    setIsSyncing(true);
+                    shipRefreshRef.current();
                     setTimeout(() => setIsSyncing(false), 500);
                   }
                 }}
@@ -383,6 +403,12 @@ function App() {
               <CharacterManagement
                 userEmail={userEmail}
                 onRefreshReady={handleSetRefreshFn}
+              />
+            )}
+            {activeTab === 'ships' && (
+              <ShipManagement
+                userEmail={userEmail}
+                onRefreshReady={handleSetShipRefreshFn}
               />
             )}
           </section>

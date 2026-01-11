@@ -180,6 +180,11 @@ export const getCharacterById = async (characterId: string): Promise<any | null>
 export const saveCharacter = async (adminEmail: string, character: any): Promise<any> => fetchData<any>(`${BASE_API_URL}/characters/${adminEmail}`, { method: 'POST', body: JSON.stringify(character) });
 export const deleteCharacter = async (adminEmail: string, characterId: string): Promise<void> => fetchData<void>(`${BASE_API_URL}/characters/${adminEmail}/${encodeURIComponent(characterId)}`, { method: 'DELETE' });
 
+// SHIP API
+export const getShips = async (adminEmail: string): Promise<any[]> => fetchData<any[]>(`${BASE_API_URL}/ships/${adminEmail}`);
+export const saveShip = async (adminEmail: string, ship: any): Promise<any> => fetchData<any>(`${BASE_API_URL}/ships/${adminEmail}`, { method: 'POST', body: JSON.stringify(ship) });
+export const deleteShip = async (adminEmail: string, shipId: string): Promise<void> => fetchData<void>(`${BASE_API_URL}/ships/${adminEmail}/${encodeURIComponent(shipId)}`, { method: 'DELETE' });
+
 // Logout
 export const logout = async (email: string): Promise<{ success: boolean, message: string }> => {
   return fetchData(`${BASE_API_URL}/auth/logout`, { method: 'POST', body: JSON.stringify({ email }) });

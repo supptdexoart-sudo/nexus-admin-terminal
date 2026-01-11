@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { GameEventType, PlayerClass } from '../types';
+import { GameEventType } from '../types';
 import type { GameEvent } from '../types';
 import { Download, RotateCcw, QrCode, Trash2, Upload, AlertTriangle, Save, Skull, Database, Layout, RefreshCcw, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -44,7 +44,7 @@ const initialEventState: GameEvent = {
     isSellOnly: false,
     canBeSaved: true,
     price: 0,
-    trapConfig: { difficulty: 10, damage: 20, disarmClass: PlayerClass.ROGUE, successMessage: "Past zneškodněna.", failMessage: "Past sklapla!" },
+    trapConfig: { difficulty: 10, damage: 20, disarmClass: 'ANY', successMessage: "Past zneškodněna.", failMessage: "Past sklapla!" },
     enemyLoot: { goldReward: 20, dropItemChance: 0 },
     timeVariant: { enabled: false, nightStats: [] },
     stationConfig: {

@@ -1,3 +1,9 @@
+export enum ShipRarity {
+    COMMON = 'COMMON',
+    RARE = 'RARE',
+    EPIC = 'EPIC',
+    LEGENDARY = 'LEGENDARY'
+}
 
 export enum GameEventType {
     ITEM = 'PŘEDMĚT',
@@ -11,12 +17,7 @@ export enum GameEventType {
     CHEST = 'TRUHLA'
 }
 
-export enum PlayerClass {
-    WARRIOR = 'Válečník',
-    MAGE = 'Mág',
-    ROGUE = 'Zloděj',
-    CLERIC = 'Kněz'
-}
+
 
 export interface Stat {
     label: string;
@@ -79,7 +80,7 @@ export interface MerchantTradeConfig {
 export interface TrapConfig {
     difficulty: number;
     damage: number;
-    disarmClass: PlayerClass | 'ANY';
+    disarmClass?: string;
     successMessage: string;
     failMessage: string;
     trapType?: string; // NEW: Např. "MECHANISMUS", "MAGICKÁ", "TECH"
@@ -160,16 +161,12 @@ export interface RecycleOutput {
     amount: number;
 }
 
-export interface ClassMarketModifier {
-    playerClass: PlayerClass;
-    priceMultiplier: number; // 0.8 = 20% sleva, 1.2 = 20% přirážka
-}
+// ClassMarketModifier removed
 
 export interface MarketConfig {
     enabled: boolean;
     marketPrice?: number; // Override standardní ceny
     saleChance: number; // 0-100% šance, že bude v akci
-    classModifiers: ClassMarketModifier[];
     recyclingOutput: RecycleOutput[];
 }
 
@@ -223,7 +220,6 @@ export interface GameEvent {
     planetProgress?: number; // Sleduje, kolikátou fázi už hráč splnil (0 = začátek)
 
     timeVariant?: TimeVariant;
-    classVariants?: Partial<Record<PlayerClass, ClassVariant>>;
     qrCodeUrl?: string;
     _merchantEntry?: MerchantItemEntry; // Temporary runtime property
 }
@@ -293,10 +289,10 @@ export interface Character {
     name: string;
     description: string;
     imageUrl?: string;
+    initialShipId?: string; // ID startovní lodě
     baseStats: {
         hp: number;
         armor: number;
-        damage: number;
         fuel: number;
         gold: number;
         oxygen: number;
@@ -312,6 +308,23 @@ export interface Character {
             }>;
             additionalPerks?: CharacterPerk[];
         };
+    };
+    createdAt?: number;
+    updatedAt?: number;
+}
+
+export interface Ship {
+    shipId: string;
+    adminEmail: string;
+    name: string;
+    description: string;
+    imageUrl?: string;
+    rarity: ShipRarity;
+    slots: number;
+    baseStats: {
+        hull: number;
+        fuelCapacity: number;
+        oxygenCapacity: number;
     };
     createdAt?: number;
     updatedAt?: number;

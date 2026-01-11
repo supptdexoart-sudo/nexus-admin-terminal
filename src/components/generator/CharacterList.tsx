@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Edit, Trash2, QrCode, X, Search, ChevronRight, Shield, Sword, Heart, AlertTriangle } from 'lucide-react';
+import { Edit, Trash2, QrCode, X, Search, ChevronRight, Shield, Heart, AlertTriangle, Coins } from 'lucide-react';
 import type { Character } from '../../types';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -105,11 +105,6 @@ const CharacterList: React.FC<CharacterListProps> = ({ characters, onEdit, onDel
                                             <span className="text-[8px] font-black text-zinc-600 uppercase">HP</span>
                                         </div>
                                         <div className="bg-black/40 rounded-xl p-3 border border-white/5 flex flex-col items-center">
-                                            <Sword size={12} className="text-orange-500 mb-1 opacity-60" />
-                                            <span className="text-sm font-black text-white">{char.baseStats.damage}</span>
-                                            <span className="text-[8px] font-black text-zinc-600 uppercase">ATK</span>
-                                        </div>
-                                        <div className="bg-black/40 rounded-xl p-3 border border-white/5 flex flex-col items-center">
                                             <Shield size={12} className="text-blue-500 mb-1 opacity-60" />
                                             <span className="text-sm font-black text-white">{char.baseStats.armor}</span>
                                             <span className="text-[8px] font-black text-zinc-600 uppercase">DEF</span>
@@ -118,6 +113,11 @@ const CharacterList: React.FC<CharacterListProps> = ({ characters, onEdit, onDel
                                             <AlertTriangle size={12} className="text-amber-500 mb-1 opacity-60" />
                                             <span className="text-sm font-black text-white">{char.hullDamageChance ?? 0}%</span>
                                             <span className="text-[8px] font-black text-zinc-600 uppercase">TRUP</span>
+                                        </div>
+                                        <div className="bg-black/40 rounded-xl p-3 border border-white/5 flex flex-col items-center">
+                                            <Coins size={12} className="text-yellow-500 mb-1 opacity-60" />
+                                            <span className="text-sm font-black text-white">{char.baseStats.gold}</span>
+                                            <span className="text-[8px] font-black text-zinc-600 uppercase">GOLD</span>
                                         </div>
                                     </div>
 

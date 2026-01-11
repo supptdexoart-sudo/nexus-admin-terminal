@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { PlayerClass } from '../../types';
 import type { GameEvent, Stat } from '../../types';
-import { Box, Heart, Shield, Coins, Wind, Trash2, Fuel, Plus, Clock, ShoppingCart, Recycle, Users, Tags, X, Hammer, CheckSquare, Square, Zap, Scroll, AlertTriangle } from 'lucide-react';
+import { Box, Heart, Shield, Coins, Wind, Trash2, Fuel, Plus, Clock, ShoppingCart, Recycle, Tags, X, Hammer, CheckSquare, Square, Zap, Scroll, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ItemPanelProps {
@@ -19,10 +18,6 @@ const ItemPanel: React.FC<ItemPanelProps> = ({ event, onUpdate, masterCatalog = 
     // Local state for recycling output
     const [selectedRecycleRes, setSelectedRecycleRes] = useState('');
     const [recycleAmount, setRecycleAmount] = useState(1);
-
-    // Local state for market class deal
-    const [selectedMarketClass, setSelectedMarketClass] = useState<PlayerClass | ''>('');
-    const [classPriceMultiplier, setClassPriceMultiplier] = useState(0.8);
 
     const addQuickStat = (label: string, value: string = '+10') => {
         const currentStats = [...(event.stats || [])];
@@ -73,7 +68,6 @@ const ItemPanel: React.FC<ItemPanelProps> = ({ event, onUpdate, masterCatalog = 
                     enabled: false,
                     marketPrice: undefined,
                     saleChance: 0,
-                    classModifiers: [],
                     recyclingOutput: []
                 }),
                 [field]: value
@@ -116,23 +110,7 @@ const ItemPanel: React.FC<ItemPanelProps> = ({ event, onUpdate, masterCatalog = 
         updateMarketConfig('recyclingOutput', currentRecycling.filter((_, i) => i !== index));
     };
 
-    const addClassModifier = () => {
-        if (!selectedMarketClass) return;
-        const currentModifiers = event.marketConfig?.classModifiers || [];
-        if (currentModifiers.some(m => m.playerClass === selectedMarketClass)) return;
-
-        updateMarketConfig('classModifiers', [
-            ...currentModifiers,
-            { playerClass: selectedMarketClass, priceMultiplier: classPriceMultiplier }
-        ]);
-        setSelectedMarketClass('');
-        setClassPriceMultiplier(0.8);
-    };
-
-    const removeClassModifier = (index: number) => {
-        const currentModifiers = event.marketConfig?.classModifiers || [];
-        updateMarketConfig('classModifiers', currentModifiers.filter((_, i) => i !== index));
-    };
+    // (CLASS MODIFIERS REMOVED)
 
     const availableResources = masterCatalog.filter(
         item => item.resourceConfig?.isResourceContainer
@@ -404,52 +382,7 @@ const ItemPanel: React.FC<ItemPanelProps> = ({ event, onUpdate, masterCatalog = 
                                 </div>
                             </div>
 
-                            {/* Class Modifiers */}
-                            <div className="space-y-4">
-                                <label className="admin-label flex items-center gap-2 text-primary opacity-80"><Users size={12} /> Ceny pro SPECIFICKÉ POSTAVY:</label>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                                    <select
-                                        value={selectedMarketClass}
-                                        onChange={(e) => setSelectedMarketClass(e.target.value as PlayerClass)}
-                                        className="admin-input text-[10px]"
-                                    >
-                                        <option value="">-- VYBERTE TŘÍDU --</option>
-                                        {Object.values(PlayerClass).map(c => <option key={c} value={c}>{c}</option>)}
-                                    </select>
-                                    <select
-                                        value={classPriceMultiplier}
-                                        onChange={(e) => setClassPriceMultiplier(parseFloat(e.target.value))}
-                                        className="admin-input text-[10px]"
-                                    >
-                                        <option value={0.5}>SALE -50%</option>
-                                        <option value={0.8}>SALE -20%</option>
-                                        <option value={1.2}>MARKUP +20%</option>
-                                        <option value={1.5}>MARKUP +50%</option>
-                                    </select>
-                                    <button
-                                        type="button"
-                                        onClick={addClassModifier}
-                                        className="admin-button-primary py-2 h-[38px]"
-                                    >
-                                        <Plus size={16} /> Přidat Přebití
-                                    </button>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {event.marketConfig.classModifiers?.map((mod, idx) => (
-                                        <span key={idx} className="px-3 py-1.5 bg-black/40 border border-primary/20 rounded-xl text-[10px] font-black uppercase flex items-center gap-3">
-                                            <span className="text-zinc-500">{mod.playerClass}</span>
-                                            <span className={mod.priceMultiplier < 1 ? 'text-green-500' : 'text-red-500'}>
-                                                {mod.priceMultiplier < 1 ? `-${Math.round((1 - mod.priceMultiplier) * 100)}%` : `+${Math.round((mod.priceMultiplier - 1) * 100)}%`}
-                                            </span>
-                                            <button
-                                                type="button"
-                                                onClick={() => removeClassModifier(idx)}
-                                                className="text-zinc-700 hover:text-white transition-colors"
-                                            ><X size={12} /></button>
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
+                            {/* (CLASS MODIFIERS UI REMOVED) */}
 
                             {/* Recycling */}
                             <div className="space-y-4">

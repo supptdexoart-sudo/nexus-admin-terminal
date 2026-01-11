@@ -1,6 +1,5 @@
 import React from 'react';
 import type { GameEvent, Stat } from '../../types';
-import { PlayerClass } from '../../types';
 import { Shield, Zap, Trash2, Heart, Swords, Wind, Fuel, Coins, Skull, Tag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -18,7 +17,7 @@ const TrapPanel: React.FC<TrapPanelProps> = ({ event, onUpdate, characters = [] 
                 ...(event.trapConfig || {
                     difficulty: 10,
                     damage: 20,
-                    disarmClass: PlayerClass.ROGUE,
+                    disarmClass: 'ANY',
                     successMessage: "Past zneškodněna.",
                     failMessage: "Past sklapla!",
                     loot: []
@@ -33,7 +32,7 @@ const TrapPanel: React.FC<TrapPanelProps> = ({ event, onUpdate, characters = [] 
         const currentConfig = event.trapConfig || {
             difficulty: 10,
             damage: 20,
-            disarmClass: PlayerClass.ROGUE,
+            disarmClass: 'ANY',
             successMessage: "Past zneškodněna.",
             failMessage: "Past sklapla!",
             loot: []
