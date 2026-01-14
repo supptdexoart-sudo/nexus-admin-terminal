@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, Save, Rocket, FileText, Zap, Gauge, Battery, Layout, Info, AlertTriangle, Fuel, Wind } from 'lucide-react';
+import { X, Save, Rocket, FileText, Zap, Layout, Info, AlertTriangle, Fuel, Wind } from 'lucide-react';
 import type { Ship } from '../../types';
 import { ShipRarity } from '../../types';
 import { motion } from 'framer-motion';
