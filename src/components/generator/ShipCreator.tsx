@@ -100,6 +100,7 @@ const ShipCreator: React.FC<ShipCreatorProps> = ({ ship, onSave, onClose }) => {
                     <button
                         onClick={onClose}
                         className="p-3 bg-white/5 hover:bg-white/10 text-zinc-500 hover:text-white rounded-2xl transition-all"
+                        aria-label="Zavřít formulář"
                     >
                         <X size={24} />
                     </button>
@@ -148,6 +149,7 @@ const ShipCreator: React.FC<ShipCreatorProps> = ({ ship, onSave, onClose }) => {
                                     value={formData.rarity}
                                     onChange={(e) => setFormData({ ...formData, rarity: e.target.value as ShipRarity })}
                                     className="admin-input font-black uppercase tracking-widest"
+                                    aria-label="Třída a rarita lodi"
                                 >
                                     <option value={ShipRarity.COMMON}>COMMON</option>
                                     <option value={ShipRarity.RARE}>RARE</option>
@@ -203,6 +205,7 @@ const ShipCreator: React.FC<ShipCreatorProps> = ({ ship, onSave, onClose }) => {
                                         value={stat.value}
                                         onChange={(e) => handleStatChange(stat.id as any, parseInt(e.target.value) || 0)}
                                         className="bg-transparent border-none p-0 text-3xl font-black text-white focus:ring-0 w-full"
+                                        aria-label={stat.label}
                                     />
                                 </div>
                             ))}
