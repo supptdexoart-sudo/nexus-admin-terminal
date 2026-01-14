@@ -61,7 +61,8 @@ const initialEventState: GameEvent = {
     },
     resourceConfig: { isResourceContainer: false, resourceName: 'Surovina', resourceAmount: 1, customLabel: 'NALEZENO:' },
     craftingRecipe: { enabled: false, requiredResources: [], craftingTimeSeconds: 60 },
-    planetConfig: { planetId: 'p1', landingEventType: GameEventType.ENCOUNTER, phases: [] }
+    planetConfig: { planetId: 'p1', landingEventType: GameEventType.ENCOUNTER, phases: [] },
+    shipUpgradeConfig: { fuelCapacityBonus: 0, oxygenCapacityBonus: 0, hullCapacityBonus: 0, hullDamageReduction: 0, isDoubleJump: false, maxUses: 2 }
 };
 
 const ID_PREFIXES: Record<string, string> = {
@@ -74,6 +75,7 @@ const ID_PREFIXES: Record<string, string> = {
     [GameEventType.SPACE_STATION]: 'VS-',
     [GameEventType.PLANET]: 'PLA-',
     [GameEventType.CHEST]: 'TRU-',
+    [GameEventType.SHIP_UPGRADE]: 'LOD-',
 };
 
 const Generator: React.FC<GeneratorProps> = ({
@@ -135,6 +137,14 @@ const Generator: React.FC<GeneratorProps> = ({
                     landingEventType: initialData.planetConfig?.landingEventType ?? GameEventType.ENCOUNTER,
                     landingEventId: initialData.planetConfig?.landingEventId,
                     phases: initialData.planetConfig?.phases ?? []
+                },
+                shipUpgradeConfig: {
+                    fuelCapacityBonus: initialData.shipUpgradeConfig?.fuelCapacityBonus ?? 0,
+                    oxygenCapacityBonus: initialData.shipUpgradeConfig?.oxygenCapacityBonus ?? 0,
+                    hullCapacityBonus: initialData.shipUpgradeConfig?.hullCapacityBonus ?? 0,
+                    hullDamageReduction: initialData.shipUpgradeConfig?.hullDamageReduction ?? 0,
+                    isDoubleJump: initialData.shipUpgradeConfig?.isDoubleJump ?? false,
+                    maxUses: initialData.shipUpgradeConfig?.maxUses ?? 2
                 },
                 isSellOnly: initialData.isSellOnly ?? false
             });
@@ -219,7 +229,8 @@ const Generator: React.FC<GeneratorProps> = ({
             [GameEventType.MERCHANT]: 'f5c518',
             [GameEventType.ITEM]: '007aff',
             [GameEventType.SPACE_STATION]: '22d3ee',
-            [GameEventType.PLANET]: '6366f1'
+            [GameEventType.PLANET]: '6366f1',
+            [GameEventType.SHIP_UPGRADE]: '6366f1'
         };
         const color = colorMap[type] || 'ffffff';
         return `https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&color=${color}&bgcolor=0a0a0c&margin=20&data=${encodeURIComponent(id)}`;
@@ -394,7 +405,9 @@ const Generator: React.FC<GeneratorProps> = ({
 
                     {/* MODULAR CONTENT PANEL */}
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        {newEvent.type === GameEventType.ITEM && <ItemPanel event={newEvent} onUpdate={updateEvent} masterCatalog={masterCatalog} />}
+                        {(newEvent.type === GameEventType.ITEM || newEvent.type === GameEventType.SHIP_UPGRADE) && (
+                            <ItemPanel event={newEvent} onUpdate={updateEvent} masterCatalog={masterCatalog} />
+                        )}
                         {newEvent.type === GameEventType.TRAP && <TrapPanel event={newEvent} onUpdate={updateEvent} characters={characters} />}
                         {(newEvent.type === GameEventType.ENCOUNTER || newEvent.type === GameEventType.BOSS) && (
                             <div className="space-y-8">

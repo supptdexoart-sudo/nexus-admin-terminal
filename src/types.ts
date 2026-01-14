@@ -14,7 +14,8 @@ export enum GameEventType {
     BOSS = 'BOSS',
     SPACE_STATION = 'VESMÍRNÁ_STANICE',
     PLANET = 'PLANETA',
-    CHEST = 'TRUHLA'
+    CHEST = 'TRUHLA',
+    SHIP_UPGRADE = 'VYLEPŠENÍ_LODI'
 }
 
 
@@ -170,6 +171,15 @@ export interface MarketConfig {
     recyclingOutput: RecycleOutput[];
 }
 
+export interface ShipUpgradeConfig {
+    fuelCapacityBonus?: number;
+    oxygenCapacityBonus?: number;
+    hullCapacityBonus?: number;
+    hullDamageReduction?: number; // % snížení šance na poškození trupu
+    isDoubleJump?: boolean;
+    maxUses?: number; // Pro double jump nebo jiné spotřební upgrady
+}
+
 export interface PlanetConfig {
     planetId: string; // ID pro párování s UI (p1, p2, p3, p4)
     landingEventType: GameEventType; // Legacy fallback
@@ -218,6 +228,8 @@ export interface GameEvent {
 
     planetConfig?: PlanetConfig;
     planetProgress?: number; // Sleduje, kolikátou fázi už hráč splnil (0 = začátek)
+
+    shipUpgradeConfig?: ShipUpgradeConfig;
 
     timeVariant?: TimeVariant;
     qrCodeUrl?: string;

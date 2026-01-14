@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { GameEventType } from '../../types';
 import type { GameEvent, Stat } from '../../types';
-import { Box, Heart, Shield, Coins, Wind, Trash2, Fuel, Plus, Clock, ShoppingCart, Recycle, Tags, X, Hammer, CheckSquare, Square, Zap, Scroll, AlertTriangle } from 'lucide-react';
+import { Box, Heart, Shield, Coins, Wind, Trash2, Fuel, Plus, Clock, ShoppingCart, Recycle, Tags, X, Hammer, CheckSquare, Square, Zap, Scroll, AlertTriangle, Rocket } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ItemPanelProps {
@@ -69,6 +70,22 @@ const ItemPanel: React.FC<ItemPanelProps> = ({ event, onUpdate, masterCatalog = 
                     marketPrice: undefined,
                     saleChance: 0,
                     recyclingOutput: []
+                }),
+                [field]: value
+            }
+        });
+    };
+
+    const updateShipUpgradeConfig = (field: string, value: any) => {
+        onUpdate({
+            shipUpgradeConfig: {
+                ...(event.shipUpgradeConfig || {
+                    fuelCapacityBonus: 0,
+                    oxygenCapacityBonus: 0,
+                    hullCapacityBonus: 0,
+                    hullDamageReduction: 0,
+                    isDoubleJump: false,
+                    maxUses: 0
                 }),
                 [field]: value
             }
@@ -423,6 +440,112 @@ const ItemPanel: React.FC<ItemPanelProps> = ({ event, onUpdate, masterCatalog = 
                                             <button onClick={() => removeRecycleOutput(idx)} className="text-zinc-700 hover:text-white transition-colors"><X size={12} /></button>
                                         </span>
                                     ))}
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+
+            {/* SHIP UPGRADE MODULE */}
+            <div className={`admin-card transition-all duration-300 ${event.type === GameEventType.SHIP_UPGRADE ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-black/40 border-white/5 opacity-60 hover:opacity-100'}`}>
+                <div className="p-6 border-b border-white/5 flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                        <Rocket size={20} className={event.type === GameEventType.SHIP_UPGRADE ? 'text-indigo-400' : 'text-zinc-600'} />
+                        <div>
+                            <h4 className={`text-xs font-black uppercase tracking-widest ${event.type === GameEventType.SHIP_UPGRADE ? 'text-white' : 'text-zinc-600'}`}>Vylepšení Lodi</h4>
+                            <p className="text-[10px] font-bold text-zinc-600 uppercase">Konfigurace parametrů pro Ship Upgrady</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <span className="text-[9px] font-bold text-zinc-500 uppercase">Aktivovat Modul</span>
+                        <div className={`w-14 h-7 rounded-full p-1.5 transition-colors cursor-pointer ${event.type === GameEventType.SHIP_UPGRADE ? 'bg-indigo-600' : 'bg-zinc-800'}`}
+                            onClick={() => onUpdate({ type: event.type === GameEventType.SHIP_UPGRADE ? GameEventType.ITEM : GameEventType.SHIP_UPGRADE })}>
+                            <div className={`w-4 h-4 bg-white rounded-full shadow-lg transform transition-transform ${event.type === GameEventType.SHIP_UPGRADE ? 'translate-x-7' : 'translate-x-0'}`}></div>
+                        </div>
+                    </div>
+                </div>
+
+                <AnimatePresence>
+                    {event.type === GameEventType.SHIP_UPGRADE && (
+                        <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="p-6 space-y-8 overflow-hidden"
+                        >
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="space-y-2">
+                                    <label className="admin-label flex items-center gap-2"><Fuel size={12} className="text-orange-500" /> Max Palivo Bonus</label>
+                                    <input
+                                        type="number"
+                                        value={event.shipUpgradeConfig?.fuelCapacityBonus || 0}
+                                        onChange={(e) => updateShipUpgradeConfig('fuelCapacityBonus', parseInt(e.target.value))}
+                                        className="admin-input"
+                                        placeholder="+ / -"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="admin-label flex items-center gap-2"><Wind size={12} className="text-cyan-500" /> Max Kyslík Bonus</label>
+                                    <input
+                                        type="number"
+                                        value={event.shipUpgradeConfig?.oxygenCapacityBonus || 0}
+                                        onChange={(e) => updateShipUpgradeConfig('oxygenCapacityBonus', parseInt(e.target.value))}
+                                        className="admin-input"
+                                        placeholder="+ / -"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="admin-label flex items-center gap-2"><AlertTriangle size={12} className="text-orange-600" /> Max Trup Bonus</label>
+                                    <input
+                                        type="number"
+                                        value={event.shipUpgradeConfig?.hullCapacityBonus || 0}
+                                        onChange={(e) => updateShipUpgradeConfig('hullCapacityBonus', parseInt(e.target.value))}
+                                        className="admin-input"
+                                        placeholder="+ / -"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-4 border-t border-white/5">
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <Zap size={18} className="text-yellow-400" />
+                                            <div>
+                                                <h5 className="text-[10px] font-black uppercase text-white tracking-widest">Double Jump Modul</h5>
+                                                <p className="text-[9px] font-bold text-zinc-500 uppercase">Umožňuje 2 skoky za 1 cenu paliva</p>
+                                            </div>
+                                        </div>
+                                        <div className={`w-12 h-6 rounded-full p-1 transition-colors cursor-pointer ${event.shipUpgradeConfig?.isDoubleJump ? 'bg-yellow-500' : 'bg-zinc-800'}`}
+                                            onClick={() => updateShipUpgradeConfig('isDoubleJump', !event.shipUpgradeConfig?.isDoubleJump)}>
+                                            <div className={`w-4 h-4 bg-white rounded-full shadow transform transition-transform ${event.shipUpgradeConfig?.isDoubleJump ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                                        </div>
+                                    </div>
+
+                                    {event.shipUpgradeConfig?.isDoubleJump && (
+                                        <div className="space-y-2 pl-11">
+                                            <label className="admin-label">Počet použití (uses):</label>
+                                            <input
+                                                type="number"
+                                                value={event.shipUpgradeConfig?.maxUses || 2}
+                                                onChange={(e) => updateShipUpgradeConfig('maxUses', parseInt(e.target.value))}
+                                                className="admin-input max-w-[100px]"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="space-y-3">
+                                    <label className="admin-label flex items-center gap-2"><Shield size={12} className="text-blue-500" /> Redukce poškození trupu ({event.shipUpgradeConfig?.hullDamageReduction || 0}%)</label>
+                                    <p className="text-[9px] font-bold text-zinc-500 uppercase mb-2">Snižuje šanci na poškození trupu při skenování</p>
+                                    <input
+                                        type="range"
+                                        min="0" max="100"
+                                        value={event.shipUpgradeConfig?.hullDamageReduction || 0}
+                                        onChange={(e) => updateShipUpgradeConfig('hullDamageReduction', parseInt(e.target.value))}
+                                        className="w-full h-2 bg-black border border-white/10 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                                    />
                                 </div>
                             </div>
                         </motion.div>

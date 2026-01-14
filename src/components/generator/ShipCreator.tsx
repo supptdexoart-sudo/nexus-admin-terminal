@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, Save, Rocket, FileText, Zap, Gauge, Battery, Layout, Info } from 'lucide-react';
+import { X, Save, Rocket, FileText, Zap, Gauge, Battery, Layout, Info, AlertTriangle, Fuel, Wind } from 'lucide-react';
 import type { Ship } from '../../types';
 import { ShipRarity } from '../../types';
 import { motion } from 'framer-motion';
@@ -115,7 +115,22 @@ const ShipCreator: React.FC<ShipCreatorProps> = ({ ship, onSave, onClose }) => {
                             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Identifikace a Rarita</h3>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div className="space-y-2">
+                                <label className="admin-label">UNIKÁTNÍ ID</label>
+                                <input
+                                    type="text"
+                                    value={formData.shipId}
+                                    onChange={(e) => setFormData({ ...formData, shipId: e.target.value.toUpperCase() })}
+                                    className="admin-input font-mono"
+                                    placeholder="AUTO-GEN"
+                                    readOnly={!!ship}
+                                />
+                                {!formData.shipId && !ship && (
+                                    <p className="text-[10px] text-primary/40 font-bold uppercase tracking-widest mt-2 italic">Auto-generováno</p>
+                                )}
+                            </div>
+
                             <div className="space-y-2">
                                 <label className="admin-label">Název LODĚ</label>
                                 <input
@@ -141,7 +156,7 @@ const ShipCreator: React.FC<ShipCreatorProps> = ({ ship, onSave, onClose }) => {
                                 </select>
                             </div>
 
-                            <div className="md:col-span-2 p-4 bg-primary/5 border border-primary/10 rounded-2xl flex items-start gap-4">
+                            <div className="md:col-span-3 p-4 bg-primary/5 border border-primary/10 rounded-2xl flex items-start gap-4">
                                 <Info size={20} className="text-primary mt-1 shrink-0" />
                                 <div>
                                     <h4 className={`text-xs font-black uppercase tracking-widest mb-1 ${getRarityInfo(formData.rarity).color}`}>
@@ -153,7 +168,7 @@ const ShipCreator: React.FC<ShipCreatorProps> = ({ ship, onSave, onClose }) => {
                                 </div>
                             </div>
 
-                            <div className="md:col-span-2 space-y-2">
+                            <div className="md:col-span-3 space-y-2">
                                 <label className="admin-label">Popis Plavidla</label>
                                 <textarea
                                     value={formData.description}
@@ -174,9 +189,9 @@ const ShipCreator: React.FC<ShipCreatorProps> = ({ ship, onSave, onClose }) => {
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {[
-                                { id: 'hull', label: 'Odolnost Trupu', icon: Rocket, iconColor: 'text-amber-500', value: formData.baseStats.hull },
-                                { id: 'fuelCapacity', label: 'Kapacita Paliva', icon: Gauge, iconColor: 'text-blue-500', value: formData.baseStats.fuelCapacity },
-                                { id: 'oxygenCapacity', label: 'Kapacita O2', icon: Battery, iconColor: 'text-emerald-500', value: formData.baseStats.oxygenCapacity }
+                                { id: 'hull', label: 'Odolnost Trupu', icon: AlertTriangle, iconColor: 'text-orange-400', value: formData.baseStats.hull },
+                                { id: 'fuelCapacity', label: 'Kapacita Paliva', icon: Fuel, iconColor: 'text-orange-500', value: formData.baseStats.fuelCapacity },
+                                { id: 'oxygenCapacity', label: 'Kapacita O2', icon: Wind, iconColor: 'text-cyan-400', value: formData.baseStats.oxygenCapacity }
                             ].map((stat) => (
                                 <div key={stat.id} className="admin-card p-4 bg-black/40 border-white/5 flex flex-col gap-4">
                                     <div className="flex items-center gap-3">
