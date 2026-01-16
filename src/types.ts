@@ -232,6 +232,7 @@ export interface GameEvent {
     shipUpgradeConfig?: ShipUpgradeConfig;
 
     timeVariant?: TimeVariant;
+    variantIds?: string[]; // IDs of other cards that can be shown instead of this one
     qrCodeUrl?: string;
     _merchantEntry?: MerchantItemEntry; // Temporary runtime property
 }

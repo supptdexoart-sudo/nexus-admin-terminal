@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Users, Database, Layout, ShieldCheck, ChevronRight, Search, PlusCircle, RefreshCcw, Menu, X, Rocket } from 'lucide-react';
+import { Users, Database, Layout, ShieldCheck, ChevronRight, Search, PlusCircle, RefreshCcw, Menu, X, Rocket, Dices, QrCode } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { playSound, vibrate } from './services/soundService';
 import Generator from './components/Generator';
 import CharacterManagement from './components/CharacterManagement';
 import ShipManagement from './components/ShipManagement';
@@ -20,6 +22,8 @@ function App() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(localStorage.getItem('nexus_admin_user'));
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showRandomQrModal, setShowRandomQrModal] = useState(false);
+  const [randomQrEvent, setRandomQrEvent] = useState<GameEvent | null>(null);
   const characterRefreshRef = useRef<(() => void) | null>(null);
   const shipRefreshRef = useRef<(() => void) | null>(null);
 
@@ -151,6 +155,31 @@ function App() {
     return matchesSearch && matchesType;
   });
 
+  const handleShowRandomQr = () => {
+    if (masterCatalog.length === 0) return;
+    const randomIndex = Math.floor(Math.random() * masterCatalog.length);
+    setRandomQrEvent(masterCatalog[randomIndex]);
+    setShowRandomQrModal(true);
+    playSound('click');
+    vibrate(20);
+  };
+
+  const getQrUrl = (id: string, type: string) => {
+    const colorMap: Record<string, string> = {
+      'BOSS': 'ff3b30',
+      'NÁSTRAHA': 'f5c518',
+      'SETKÁNÍ': 'ff3b30',
+      'DILEMA': '9333ea',
+      'OBCHODNÍK': 'f5c518',
+      'PŘEDMĚT': '007aff',
+      'VESMÍRNÁ_STANICE': '22d3ee',
+      'PLANETA': '6366f1',
+      'LODNÍ_UPGRADE': '6366f1'
+    };
+    const color = colorMap[type] || 'ffffff';
+    return `https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&color=${color}&bgcolor=0a0a0c&margin=20&data=${encodeURIComponent(id)}`;
+  };
+
   if (!userEmail || userEmail.toLowerCase() !== AUTHORIZED_ADMIN.toLowerCase()) {
     return <LoginScreen onLogin={handleLogin} onLogout={handleLogout} />;
   }
@@ -222,6 +251,16 @@ function App() {
             <Rocket size={20} className={activeTab === 'ships' ? 'text-primary' : 'group-hover:text-white'} />
             <span className="font-bold text-sm uppercase tracking-wide">Lodě</span>
           </button>
+
+          <div className="pt-4 mt-4 border-t border-white/5 space-y-2">
+            <button
+              onClick={handleShowRandomQr}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all group bg-primary/5 hover:bg-primary/10 text-primary border border-primary/20"
+            >
+              <Dices size={20} className="text-primary" />
+              <span className="font-bold text-sm uppercase tracking-wide">Random QR</span>
+            </button>
+          </div>
         </nav>
 
         <div className="p-4 border-t border-white/5">
@@ -371,7 +410,14 @@ function App() {
                             </span>
                             <span className="text-sm font-bold truncate leading-tight">{item.title}</span>
                           </div>
-                          <ChevronRight size={14} className={`opacity-0 group-hover:opacity-100 transition-opacity ${editingEvent?.id === item.id ? 'text-dark' : 'text-zinc-500'}`} />
+                          <div className="flex flex-col items-end gap-1 shrink-0">
+                            {item.variantIds && item.variantIds.length > 0 && (
+                              <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${editingEvent?.id === item.id ? 'bg-dark/20 text-dark' : 'bg-primary/20 text-primary'}`}>
+                                {1 + item.variantIds.length}/3
+                              </span>
+                            )}
+                            <ChevronRight size={14} className={`opacity-0 group-hover:opacity-100 transition-opacity ${editingEvent?.id === item.id ? 'text-dark' : 'text-zinc-500'}`} />
+                          </div>
                         </button>
                       ))}
                       {filteredCatalog.length === 0 && (
@@ -459,7 +505,14 @@ function App() {
                       </span>
                       <span className="text-sm font-bold truncate leading-tight">{item.title}</span>
                     </div>
-                    <ChevronRight size={14} className={`opacity-0 group-hover:opacity-100 transition-opacity ${editingEvent?.id === item.id ? 'text-dark' : 'text-zinc-500'}`} />
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      {item.variantIds && item.variantIds.length > 0 && (
+                        <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${editingEvent?.id === item.id ? 'bg-dark/20 text-dark' : 'bg-primary/20 text-primary'}`}>
+                          {1 + item.variantIds.length}/3
+                        </span>
+                      )}
+                      <ChevronRight size={14} className={`opacity-0 group-hover:opacity-100 transition-opacity ${editingEvent?.id === item.id ? 'text-dark' : 'text-zinc-500'}`} />
+                    </div>
                   </button>
                 ))}
                 {filteredCatalog.length === 0 && (
@@ -476,7 +529,63 @@ function App() {
 
         </div>
       </main>
-    </div>
+
+      <AnimatePresence>
+        {showRandomQrModal && randomQrEvent && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[1000] bg-black/90 backdrop-blur-xl flex items-center justify-center p-6"
+            onClick={() => setShowRandomQrModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-arc-panel border border-primary/30 w-full max-w-sm rounded-[2.5rem] p-1 shadow-[0_0_150px_rgba(0,122,255,0.2)]"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="bg-black/40 rounded-[2.3rem] p-8 text-center space-y-6">
+                <div className="flex justify-between items-center mb-2">
+                  <div className="flex items-center gap-2">
+                    <QrCode className="text-primary w-5 h-5 shadow-neon" />
+                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white">TESTOVACÍ QR</h3>
+                  </div>
+                  <button onClick={() => setShowRandomQrModal(false)} className="text-zinc-500 hover:text-white p-2">
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <div className="bg-white p-6 rounded-3xl shadow-neon-strong transform hover:scale-105 transition-transform duration-500 flex items-center justify-center">
+                  <img
+                    src={getQrUrl(randomQrEvent.id, randomQrEvent.type)}
+                    alt="RANDOM QR"
+                    className="w-56 h-56 object-contain"
+                  />
+                </div>
+
+                <div className="space-y-4">
+                  <div className="bg-primary/10 border border-primary/30 p-4 rounded-2xl">
+                    <p className="text-[10px] font-black text-primary/60 uppercase tracking-widest mb-1">IDENTIFIKÁTOR KARTY</p>
+                    <p className="text-xl font-mono font-black text-white tracking-wider">{randomQrEvent.id}</p>
+                    <p className="text-[10px] font-bold text-zinc-500 uppercase mt-1 truncate">{randomQrEvent.title}</p>
+                  </div>
+
+                  <button
+                    onClick={handleShowRandomQr}
+                    className="w-full py-4 bg-primary text-dark font-black uppercase text-sm tracking-[0.2em] rounded-2xl hover:scale-[1.02] active:scale-95 transition-all shadow-neon flex items-center justify-center gap-3"
+                  >
+                    <RefreshCcw className="w-5 h-5" />
+                    DALŠÍ NÁHODNÝ
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div >
   );
 }
 

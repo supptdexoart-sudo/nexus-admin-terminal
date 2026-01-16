@@ -18,6 +18,7 @@ import NightVariantPanel from './generator/NightVariantPanel';
 import SpaceStationPanel from './generator/SpaceStationPanel';
 import PlanetPanel from './generator/PlanetPanel';
 import ChestPanel from './generator/ChestPanel';
+import VariantPanel from './generator/VariantPanel';
 
 interface GeneratorProps {
     onSaveCard: (event: GameEvent) => void;
@@ -47,6 +48,7 @@ const initialEventState: GameEvent = {
     trapConfig: { difficulty: 10, damage: 20, disarmClass: 'ANY', successMessage: "Past zneškodněna.", failMessage: "Past sklapla!" },
     enemyLoot: { goldReward: 20, dropItemChance: 0 },
     timeVariant: { enabled: false, nightStats: [] },
+    variantIds: [],
     stationConfig: {
         fuelReward: 50,
         repairAmount: 30,
@@ -152,7 +154,7 @@ const Generator: React.FC<GeneratorProps> = ({
         } else {
             const prefix = ID_PREFIXES[GameEventType.ITEM];
             const randomSuffix = Math.floor(Math.random() * 9000) + 1000;
-            setNewEvent({ ...initialEventState, id: `${prefix}${randomSuffix}` });
+            setNewEvent({ ...initialEventState, id: `${prefix}${randomSuffix}`, variantIds: [] });
             setIsEditingMode(false);
         }
     }, [initialData]);
@@ -423,6 +425,10 @@ const Generator: React.FC<GeneratorProps> = ({
 
                         <div className="mt-8">
                             <NightVariantPanel event={newEvent} onUpdate={updateEvent} />
+                        </div>
+
+                        <div className="mt-8">
+                            <VariantPanel event={newEvent} onUpdate={updateEvent} masterCatalog={masterCatalog} />
                         </div>
                     </div>
                 </div>
